@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
+    void deleteAllByWallet(com.Tithaal.Wallet.entity.Wallet wallet);
 }

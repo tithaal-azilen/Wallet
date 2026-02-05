@@ -16,6 +16,10 @@ public class RegisterDto {
     @Email(message = "Email should be valid")
     private String email;
 
+    private String city;
+
+    private String phoneNumber;
+
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;

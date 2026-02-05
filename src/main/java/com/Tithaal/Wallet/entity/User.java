@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @Column
+    private String city;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 

@@ -1,0 +1,41 @@
+package com.Tithaal.Wallet.controller;
+
+import com.Tithaal.Wallet.dto.UpdateUserDto;
+import com.Tithaal.Wallet.dto.UserDetailDto;
+import com.Tithaal.Wallet.dto.UserSummaryDto;
+import com.Tithaal.Wallet.entity.User;
+import com.Tithaal.Wallet.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<List<UserSummaryDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDetailDto> getUserDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserDetails(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto updateDto) {
+        return ResponseEntity.ok(userService.updateUser(id, updateDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+}
