@@ -597,3 +597,446 @@ This generated password is for development use only. Your security configuration
 2026-02-05T16:54:16.672+05:30  INFO 265372 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-02-05T16:54:16.673+05:30  INFO 265372 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-02-05T16:54:16.675+05:30  INFO 265372 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-06T10:15:14.105+05:30  INFO 313255 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 313255 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T10:15:14.110+05:30  INFO 313255 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T10:15:14.982+05:30  INFO 313255 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T10:15:15.067+05:30  INFO 313255 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 72 ms. Found 3 JPA repository interfaces.
+2026-02-06T10:15:15.757+05:30  INFO 313255 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T10:15:15.777+05:30  INFO 313255 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T10:15:15.778+05:30  INFO 313255 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T10:15:15.851+05:30  INFO 313255 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1667 ms
+2026-02-06T10:15:16.065+05:30  INFO 313255 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T10:15:16.136+05:30  INFO 313255 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T10:15:16.694+05:30  INFO 313255 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T10:15:16.743+05:30  INFO 313255 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T10:15:17.106+05:30  INFO 313255 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@773f3360
+2026-02-06T10:15:17.108+05:30  INFO 313255 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T10:15:17.158+05:30  WARN 313255 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T10:15:17.189+05:30  INFO 313255 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T10:15:18.414+05:30  INFO 313255 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T10:15:18.537+05:30  INFO 313255 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T10:15:18.684+05:30  INFO 313255 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T10:15:19.048+05:30  WARN 313255 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T10:15:19.162+05:30  WARN 313255 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: b6ade061-da12-4ac1-8108-57bf8da2ea36
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T10:15:19.173+05:30  INFO 313255 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T10:15:19.726+05:30  INFO 313255 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T10:15:19.734+05:30  INFO 313255 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.248 seconds (process running for 6.733)
+2026-02-06T10:15:25.278+05:30  INFO 313255 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-06T10:15:25.290+05:30  INFO 313255 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-06T10:15:25.307+05:30  INFO 313255 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T10:15:25.315+05:30  INFO 313255 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T10:15:25.375+05:30  INFO 313255 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T10:30:34.306+05:30  INFO 320387 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 320387 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T10:30:34.311+05:30  INFO 320387 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T10:30:35.199+05:30  INFO 320387 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T10:30:35.295+05:30  INFO 320387 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 82 ms. Found 3 JPA repository interfaces.
+2026-02-06T10:30:35.998+05:30  INFO 320387 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T10:30:36.016+05:30  INFO 320387 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T10:30:36.017+05:30  INFO 320387 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T10:30:36.075+05:30  INFO 320387 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1698 ms
+2026-02-06T10:30:36.267+05:30  INFO 320387 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T10:30:36.334+05:30  INFO 320387 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T10:30:36.907+05:30  INFO 320387 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T10:30:36.955+05:30  INFO 320387 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T10:30:37.327+05:30  INFO 320387 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@773f3360
+2026-02-06T10:30:37.329+05:30  INFO 320387 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T10:30:37.371+05:30  WARN 320387 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T10:30:37.404+05:30  INFO 320387 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T10:30:38.608+05:30  INFO 320387 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T10:30:38.725+05:30  INFO 320387 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T10:30:38.838+05:30  INFO 320387 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T10:30:39.193+05:30  WARN 320387 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T10:30:39.296+05:30  WARN 320387 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: fc967532-5cc7-4191-a6c6-1e7ed9a7c723
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T10:30:39.307+05:30  INFO 320387 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T10:30:39.861+05:30  INFO 320387 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T10:30:39.870+05:30  INFO 320387 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.207 seconds (process running for 6.635)
+2026-02-06T10:30:52.433+05:30  INFO 320387 --- [Wallet] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06T10:30:52.433+05:30  INFO 320387 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-06T10:30:52.435+05:30  INFO 320387 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-06T10:30:53.241+05:30 ERROR 320387 --- [Wallet] [http-nio-8081-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.RuntimeException: Username is already taken!] with root cause
+
+java.lang.RuntimeException: Username is already taken!
+	at com.Tithaal.Wallet.service.impl.UserServiceImpl.registerUser(UserServiceImpl.java:32) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.3.jar:7.0.3]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.3.jar:7.0.3]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.3.jar:7.0.3]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.3.jar:7.0.3]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.3.jar:7.0.3]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.3.jar:7.0.3]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.3.jar:7.0.3]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.3.jar:7.0.3]
+	at com.Tithaal.Wallet.service.impl.UserServiceImpl$$SpringCGLIB$$0.registerUser(<generated>) ~[classes/:na]
+	at com.Tithaal.Wallet.controller.AuthController.register(AuthController.java:22) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649) ~[tomcat-embed-core-11.0.15.jar:6.1]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.3.jar:7.0.3]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.15.jar:6.1]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.15.jar:11.0.15]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195) ~[spring-security-web-7.0.2.jar:7.0.2]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317) ~[spring-security-config-7.0.2.jar:7.0.2]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.3.jar:7.0.3]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.15.jar:11.0.15]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-02-06T11:09:26.147+05:30  INFO 335707 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 335707 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T11:09:26.151+05:30  INFO 335707 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T11:09:27.039+05:30  INFO 335707 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T11:09:27.123+05:30  INFO 335707 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 71 ms. Found 3 JPA repository interfaces.
+2026-02-06T11:09:27.820+05:30  INFO 335707 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T11:09:27.841+05:30  INFO 335707 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T11:09:27.842+05:30  INFO 335707 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T11:09:27.913+05:30  INFO 335707 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1698 ms
+2026-02-06T11:09:28.110+05:30  INFO 335707 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T11:09:28.178+05:30  INFO 335707 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T11:09:28.755+05:30  INFO 335707 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T11:09:28.802+05:30  INFO 335707 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T11:09:29.188+05:30  INFO 335707 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18a0721b
+2026-02-06T11:09:29.190+05:30  INFO 335707 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T11:09:29.230+05:30  WARN 335707 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T11:09:29.261+05:30  INFO 335707 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T11:09:30.471+05:30  INFO 335707 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T11:09:30.599+05:30  INFO 335707 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:09:30.732+05:30  INFO 335707 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T11:09:31.117+05:30  WARN 335707 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T11:09:31.219+05:30  WARN 335707 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: e6f0dcb7-4461-4959-ac1f-de1b99dc6977
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T11:09:31.229+05:30  INFO 335707 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T11:09:31.764+05:30  WARN 335707 --- [Wallet] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-02-06T11:09:31.767+05:30  INFO 335707 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:09:31.769+05:30  INFO 335707 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T11:09:31.783+05:30  INFO 335707 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T11:09:31.799+05:30  INFO 335707 --- [Wallet] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-06T11:09:31.818+05:30 ERROR 335707 --- [Wallet] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8081 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8081 or configure this application to listen on another port.
+
+2026-02-06T11:09:44.981+05:30  INFO 320387 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-06T11:09:44.989+05:30  INFO 320387 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-06T11:09:45.004+05:30  INFO 320387 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:09:45.013+05:30  INFO 320387 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T11:09:45.043+05:30  INFO 320387 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T11:10:00.666+05:30  INFO 336172 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 336172 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T11:10:00.673+05:30  INFO 336172 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T11:10:01.618+05:30  INFO 336172 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T11:10:01.698+05:30  INFO 336172 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 66 ms. Found 3 JPA repository interfaces.
+2026-02-06T11:10:02.384+05:30  INFO 336172 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T11:10:02.407+05:30  INFO 336172 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T11:10:02.408+05:30  INFO 336172 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T11:10:02.508+05:30  INFO 336172 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1740 ms
+2026-02-06T11:10:02.729+05:30  INFO 336172 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T11:10:02.797+05:30  INFO 336172 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T11:10:03.370+05:30  INFO 336172 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T11:10:03.417+05:30  INFO 336172 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T11:10:03.805+05:30  INFO 336172 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18a0721b
+2026-02-06T11:10:03.807+05:30  INFO 336172 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T11:10:03.850+05:30  WARN 336172 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T11:10:03.882+05:30  INFO 336172 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T11:10:05.127+05:30  INFO 336172 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T11:10:05.265+05:30  INFO 336172 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:10:05.386+05:30  INFO 336172 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T11:10:05.788+05:30  WARN 336172 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T11:10:05.892+05:30  WARN 336172 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 41cc4a17-e451-45cf-b909-c7cd3747faa9
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T11:10:05.904+05:30  INFO 336172 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T11:10:06.476+05:30  INFO 336172 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T11:10:06.484+05:30  INFO 336172 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.511 seconds (process running for 6.954)
+2026-02-06T11:10:51.065+05:30  INFO 336172 --- [Wallet] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06T11:10:51.066+05:30  INFO 336172 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-06T11:10:51.068+05:30  INFO 336172 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-06T11:12:02.103+05:30  INFO 336172 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-06T11:12:02.111+05:30  INFO 336172 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-06T11:12:02.127+05:30  INFO 336172 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:12:02.135+05:30  INFO 336172 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T11:12:02.166+05:30  INFO 336172 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T11:12:14.966+05:30  INFO 337473 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 337473 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T11:12:14.971+05:30  INFO 337473 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T11:12:15.884+05:30  INFO 337473 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T11:12:15.964+05:30  INFO 337473 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 67 ms. Found 3 JPA repository interfaces.
+2026-02-06T11:12:16.636+05:30  INFO 337473 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T11:12:16.657+05:30  INFO 337473 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T11:12:16.658+05:30  INFO 337473 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T11:12:16.721+05:30  INFO 337473 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1681 ms
+2026-02-06T11:12:16.924+05:30  INFO 337473 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T11:12:16.991+05:30  INFO 337473 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T11:12:17.565+05:30  INFO 337473 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T11:12:17.610+05:30  INFO 337473 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T11:12:18.136+05:30  INFO 337473 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18a0721b
+2026-02-06T11:12:18.138+05:30  INFO 337473 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T11:12:18.181+05:30  WARN 337473 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T11:12:18.215+05:30  INFO 337473 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T11:12:19.530+05:30  INFO 337473 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T11:12:19.644+05:30  INFO 337473 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:12:19.770+05:30  INFO 337473 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T11:12:20.149+05:30  WARN 337473 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T11:12:20.250+05:30  WARN 337473 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 228fe553-4ab9-41da-8048-90c22aa8e040
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T11:12:20.261+05:30  INFO 337473 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T11:12:20.847+05:30  INFO 337473 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T11:12:20.856+05:30  INFO 337473 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.545 seconds (process running for 6.972)
+2026-02-06T11:13:33.203+05:30  INFO 337473 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06T11:13:33.204+05:30  INFO 337473 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-06T11:13:33.206+05:30  INFO 337473 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-06T11:17:04.633+05:30  INFO 337473 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-06T11:17:04.744+05:30  INFO 337473 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-06T11:17:04.787+05:30  INFO 337473 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:17:04.799+05:30  INFO 337473 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T11:17:04.827+05:30  INFO 337473 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T11:17:16.998+05:30  INFO 339788 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 339788 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T11:17:17.002+05:30  INFO 339788 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T11:17:17.881+05:30  INFO 339788 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T11:17:17.963+05:30  INFO 339788 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 68 ms. Found 3 JPA repository interfaces.
+2026-02-06T11:17:18.645+05:30  INFO 339788 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T11:17:18.665+05:30  INFO 339788 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T11:17:18.665+05:30  INFO 339788 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T11:17:18.726+05:30  INFO 339788 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1656 ms
+2026-02-06T11:17:18.923+05:30  INFO 339788 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T11:17:18.992+05:30  INFO 339788 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T11:17:19.559+05:30  INFO 339788 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T11:17:19.605+05:30  INFO 339788 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T11:17:19.980+05:30  INFO 339788 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18a0721b
+2026-02-06T11:17:19.982+05:30  INFO 339788 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T11:17:20.023+05:30  WARN 339788 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T11:17:20.055+05:30  INFO 339788 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T11:17:21.328+05:30  INFO 339788 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T11:17:21.442+05:30  INFO 339788 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:17:21.563+05:30  INFO 339788 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T11:17:21.931+05:30  WARN 339788 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T11:17:22.037+05:30  WARN 339788 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 7433c92f-0329-47e8-9610-25786b12a7cc
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T11:17:22.048+05:30  INFO 339788 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T11:17:22.613+05:30  INFO 339788 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T11:17:22.622+05:30  INFO 339788 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.268 seconds (process running for 6.806)
+2026-02-06T11:17:28.100+05:30  INFO 339788 --- [Wallet] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06T11:17:28.101+05:30  INFO 339788 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-06T11:17:28.103+05:30  INFO 339788 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-06T11:19:05.534+05:30  INFO 339788 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-06T11:19:05.542+05:30  INFO 339788 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-06T11:19:05.560+05:30  INFO 339788 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:19:05.567+05:30  INFO 339788 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-06T11:19:05.609+05:30  INFO 339788 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-06T11:19:12.390+05:30  INFO 340810 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 340810 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-06T11:19:12.395+05:30  INFO 340810 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-06T11:19:13.293+05:30  INFO 340810 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-06T11:19:13.377+05:30  INFO 340810 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 70 ms. Found 3 JPA repository interfaces.
+2026-02-06T11:19:14.065+05:30  INFO 340810 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-06T11:19:14.084+05:30  INFO 340810 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-06T11:19:14.085+05:30  INFO 340810 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-06T11:19:14.144+05:30  INFO 340810 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1682 ms
+2026-02-06T11:19:14.344+05:30  INFO 340810 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-06T11:19:14.411+05:30  INFO 340810 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-06T11:19:14.986+05:30  INFO 340810 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-06T11:19:15.031+05:30  INFO 340810 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-06T11:19:15.389+05:30  INFO 340810 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@18a0721b
+2026-02-06T11:19:15.391+05:30  INFO 340810 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-06T11:19:15.432+05:30  WARN 340810 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-06T11:19:15.464+05:30  INFO 340810 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-06T11:19:16.726+05:30  INFO 340810 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-06T11:19:16.836+05:30  INFO 340810 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-06T11:19:16.947+05:30  INFO 340810 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-06T11:19:17.334+05:30  WARN 340810 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-06T11:19:17.445+05:30  WARN 340810 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 2551c063-2ac4-403a-bdd2-52a8c424744d
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-06T11:19:17.456+05:30  INFO 340810 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-06T11:19:18.022+05:30  INFO 340810 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-06T11:19:18.032+05:30  INFO 340810 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.281 seconds (process running for 6.733)
+2026-02-06T11:19:32.454+05:30  INFO 340810 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06T11:19:32.455+05:30  INFO 340810 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-06T11:19:32.457+05:30  INFO 340810 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
