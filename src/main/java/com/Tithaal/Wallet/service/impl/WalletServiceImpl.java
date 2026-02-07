@@ -45,4 +45,56 @@ public class WalletServiceImpl implements WalletService {
 
         return savedWallet;
     }
+
+    @Override
+    @Transactional
+    public Wallet transferFunds(Long senderWalletId, Long recipientWalletId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        }
+
+        if (senderWalletId.equals(recipientWalletId)) {
+            throw new RuntimeException("Cannot transfer funds to the same wallet");
+        }
+
+        Wallet senderWallet = walletRepository.findById(senderWalletId)
+                .orElseThrow(() -> new RuntimeException("Sender wallet not found with id: " + senderWalletId));
+
+        Wallet recipientWallet = walletRepository.findById(recipientWalletId)
+                .orElseThrow(() -> new RuntimeException("Recipient wallet not found with id: " + recipientWalletId));
+
+        if (senderWallet.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+        // Debit sender
+        senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
+        Wallet savedSenderWallet = walletRepository.save(senderWallet);
+
+        WalletTransaction senderTransaction = WalletTransaction.builder()
+                .wallet(savedSenderWallet)
+                .type("DEBIT")
+                .amount(amount)
+                .description("Transfer to wallet id: " + recipientWalletId)
+                .balanceAfter(savedSenderWallet.getBalance())
+                .createdAt(Instant.now())
+                .build();
+        walletTransactionRepository.save(senderTransaction);
+
+        // Credit recipient
+        recipientWallet.setBalance(recipientWallet.getBalance().add(amount));
+        Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
+
+        WalletTransaction recipientTransaction = WalletTransaction.builder()
+                .wallet(savedRecipientWallet)
+                .type("CREDIT")
+                .amount(amount)
+                .description("Transfer from wallet id: " + senderWalletId)
+                .balanceAfter(savedRecipientWallet.getBalance())
+                .createdAt(Instant.now())
+                .build();
+        walletTransactionRepository.save(recipientTransaction);
+
+        return savedSenderWallet;
+    }
 }
