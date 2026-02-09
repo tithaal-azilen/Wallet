@@ -13,7 +13,7 @@ public class RegisterDto {
     private String username;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
+    @Email(message = "provide valid email")
     private String email;
 
     private String city;

@@ -3,9 +3,10 @@ package com.Tithaal.Wallet.controller;
 import com.Tithaal.Wallet.dto.UpdateUserDto;
 import com.Tithaal.Wallet.dto.UserDetailDto;
 import com.Tithaal.Wallet.dto.UserSummaryDto;
-import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +30,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto updateDto) {
-        return ResponseEntity.ok(userService.updateUser(id, updateDto));
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto updateDto) {
+        userService.updateUser(id, updateDto);
+        return new ResponseEntity<>("User Updated Successfully!", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>("User Deleted Successfully!", HttpStatus.OK);
     }
 }

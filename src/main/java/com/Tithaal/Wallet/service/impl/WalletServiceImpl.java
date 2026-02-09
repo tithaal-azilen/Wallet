@@ -2,10 +2,13 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
+import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +26,11 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     public Wallet creditWallet(Long walletId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Amount must be greater than 0");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Amount must be greater than 0");
         }
 
         Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found with id: " + walletId));
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Wallet not found with id: " + walletId));
 
         wallet.setBalance(wallet.getBalance().add(amount));
         Wallet savedWallet = walletRepository.save(wallet);
@@ -50,21 +53,23 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     public Wallet transferFunds(Long senderWalletId, Long recipientWalletId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Amount must be greater than 0");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Amount must be greater than 0");
         }
 
         if (senderWalletId.equals(recipientWalletId)) {
-            throw new RuntimeException("Cannot transfer funds to the same wallet");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Cannot transfer funds to the same wallet");
         }
 
         Wallet senderWallet = walletRepository.findById(senderWalletId)
-                .orElseThrow(() -> new RuntimeException("Sender wallet not found with id: " + senderWalletId));
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND,
+                        "Sender wallet not found with id: " + senderWalletId));
 
         Wallet recipientWallet = walletRepository.findById(recipientWalletId)
-                .orElseThrow(() -> new RuntimeException("Recipient wallet not found with id: " + recipientWalletId));
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND,
+                        "Recipient wallet not found with id: " + recipientWalletId));
 
         if (senderWallet.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Insufficient balance");
         }
 
         // Debit sender

@@ -2,6 +2,9 @@ package com.Tithaal.Wallet.service;
 
 import com.Tithaal.Wallet.dto.LoginDto;
 import com.Tithaal.Wallet.dto.RegisterDto;
+import com.Tithaal.Wallet.dto.UpdateUserDto;
+import com.Tithaal.Wallet.dto.UserDetailDto;
+import com.Tithaal.Wallet.dto.UserSummaryDto;
 import com.Tithaal.Wallet.entity.User;
 
 public interface UserService {
@@ -9,11 +12,11 @@ public interface UserService {
 
     User loginUser(LoginDto loginDto);
 
-    java.util.List<com.Tithaal.Wallet.dto.UserSummaryDto> getAllUsers();
+    java.util.List<UserSummaryDto> getAllUsers();
 
-    com.Tithaal.Wallet.dto.UserDetailDto getUserDetails(Long userId);
+    UserDetailDto getUserDetails(Long userId);
 
-    User updateUser(Long userId, com.Tithaal.Wallet.dto.UpdateUserDto updateDto);
+    User updateUser(Long userId, UpdateUserDto updateDto);
 
     void deleteUser(Long userId);
 }

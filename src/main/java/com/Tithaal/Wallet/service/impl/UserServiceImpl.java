@@ -2,16 +2,21 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.LoginDto;
 import com.Tithaal.Wallet.dto.RegisterDto;
+import com.Tithaal.Wallet.dto.UpdateUserDto;
+import com.Tithaal.Wallet.dto.UserDetailDto;
+import com.Tithaal.Wallet.dto.UserSummaryDto;
 import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.UserService;
+import com.Tithaal.Wallet.exception.APIException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -29,10 +34,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User registerUser(RegisterDto registerDto) {
         if (userRepository.existsByUsername(registerDto.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
         }
         if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new RuntimeException("Email is already taken!");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Email is already taken!");
         }
 
         User user = User.builder()
@@ -60,20 +65,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User loginUser(LoginDto loginDto) {
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with username or email: " + loginDto.getUsernameOrEmail()));
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid password!");
+            throw new APIException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
 
         return user;
     }
 
     @Override
-    public java.util.List<com.Tithaal.Wallet.dto.UserSummaryDto> getAllUsers() {
+    public java.util.List<UserSummaryDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(user -> com.Tithaal.Wallet.dto.UserSummaryDto.builder()
+                .map(user -> UserSummaryDto.builder()
                         .id(user.getId())
                         .username(user.getUsername())
                         .city(user.getCity())
@@ -83,14 +88,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public com.Tithaal.Wallet.dto.UserDetailDto getUserDetails(Long userId) {
+    public UserDetailDto getUserDetails(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                        "User not found with id: " + userId));
 
         Wallet wallet = walletRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for user id: " + userId));
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                        "Wallet not found for user id: " + userId));
 
-        return com.Tithaal.Wallet.dto.UserDetailDto.builder()
+        return UserDetailDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -102,15 +109,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, com.Tithaal.Wallet.dto.UpdateUserDto updateDto) {
+    public User updateUser(Long userId, UpdateUserDto updateDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                        "User not found with id: " + userId));
 
         if (updateDto.getCity() != null) {
             user.setCity(updateDto.getCity());
         }
         if (updateDto.getPhoneNumber() != null) {
             user.setPhoneNumber(updateDto.getPhoneNumber());
+        }
+        if (updateDto.getPassword() != null) {
+            user.setPasswordHash(passwordEncoder.encode(updateDto.getPassword()));
+        }
+        if (updateDto.getEmail() != null) {
+            user.setEmail(updateDto.getEmail());
+        }
+        if (updateDto.getUsername() != null) {
+            user.setUsername(updateDto.getUsername());
         }
 
         return userRepository.save(user);
@@ -120,7 +137,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                        "User not found with id: " + userId));
 
         walletRepository.findByUser(user).ifPresent(wallet -> {
             walletTransactionRepository.deleteAllByWallet(wallet);
