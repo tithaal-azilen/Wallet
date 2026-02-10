@@ -102,4 +102,15 @@ public class WalletServiceImpl implements WalletService {
 
         return savedSenderWallet;
     }
+
+    @Override
+    @Transactional
+    public void validateWalletOwnership(Long walletId, Long userId) {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Wallet not found with id: " + walletId));
+
+        if (!wallet.getUser().getId().equals(userId)) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Wallet does not belong to user with id: " + userId);
+        }
+    }
 }
