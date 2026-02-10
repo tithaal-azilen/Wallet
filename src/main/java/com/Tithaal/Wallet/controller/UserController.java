@@ -40,4 +40,10 @@ public class UserController {
         userService.deleteUser(id);
         return new ResponseEntity<>("User Deleted Successfully!", HttpStatus.OK);
     }
+
+    @PostMapping("/{id}/addwallet")
+    public ResponseEntity<String> addWallet(@PathVariable Long id) {
+        userService.addWallet(id);
+        return new ResponseEntity<>("Wallet Added Successfully!", HttpStatus.CREATED);
+    }
 }

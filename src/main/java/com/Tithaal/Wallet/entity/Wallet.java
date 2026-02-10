@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "wallet", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "user_id")
-})
+@Table(name = "wallet")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +19,8 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)

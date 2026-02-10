@@ -3,8 +3,8 @@ package com.Tithaal.Wallet.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,5 +15,5 @@ public class UserDetailDto {
     private String city;
     private String phoneNumber;
     private Instant createdAt;
-    private BigDecimal walletBalance;
+    private List<WalletDto> wallets;
 }

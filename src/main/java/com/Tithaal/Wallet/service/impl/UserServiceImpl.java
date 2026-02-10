@@ -63,6 +63,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public Wallet addWallet(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "User not found with id: " + userId));
+
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .balance(BigDecimal.ZERO)
+                .createdAt(Instant.now())
+                .build();
+
+        return walletRepository.save(wallet);
+    }
+
+    @Override
     public User loginUser(LoginDto loginDto) {
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
@@ -93,9 +108,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with id: " + userId));
 
-        Wallet wallet = walletRepository.findByUser(user)
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
-                        "Wallet not found for user id: " + userId));
+        java.util.List<Wallet> wallets = walletRepository.findByUser(user);
 
         return UserDetailDto.builder()
                 .id(user.getId())
@@ -104,7 +117,13 @@ public class UserServiceImpl implements UserService {
                 .city(user.getCity())
                 .phoneNumber(user.getPhoneNumber())
                 .createdAt(user.getCreatedAt())
-                .walletBalance(wallet.getBalance())
+                .wallets(wallets.stream()
+                        .map(wallet -> com.Tithaal.Wallet.dto.WalletDto.builder()
+                                .id(wallet.getId())
+                                .balance(wallet.getBalance())
+                                .createdAt(wallet.getCreatedAt())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()))
                 .build();
     }
 
@@ -140,7 +159,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with id: " + userId));
 
-        walletRepository.findByUser(user).ifPresent(wallet -> {
+        java.util.List<Wallet> wallets = walletRepository.findByUser(user);
+        wallets.forEach(wallet -> {
             walletTransactionRepository.deleteAllByWallet(wallet);
             walletRepository.delete(wallet);
         });
