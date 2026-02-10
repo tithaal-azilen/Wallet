@@ -10,4 +10,6 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     void deleteAllByWallet(Wallet wallet);
 
     java.util.List<WalletTransaction> findByWalletIdOrderByCreatedAtDesc(Long walletId);
+
+    java.util.List<WalletTransaction> findAllByWalletUserIdOrderByCreatedAtDesc(Long userId);
 }

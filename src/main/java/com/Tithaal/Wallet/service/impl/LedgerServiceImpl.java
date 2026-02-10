@@ -1,9 +1,7 @@
 package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.LedgerEntryDto;
-import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
-import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.LedgerService;
 import lombok.RequiredArgsConstructor;
@@ -16,30 +14,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LedgerServiceImpl implements LedgerService {
 
-    private final WalletRepository walletRepository;
-    private final WalletTransactionRepository walletTransactionRepository;
+        private final WalletTransactionRepository walletTransactionRepository;
 
-    @Override
-    public List<LedgerEntryDto> getUserLedger(Long userId) {
-        Wallet wallet = walletRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for user id: " + userId));
+        @Override
+        public List<LedgerEntryDto> getUserLedger(Long userId) {
+                List<WalletTransaction> transactions = walletTransactionRepository
+                                .findAllByWalletUserIdOrderByCreatedAtDesc(userId);
 
-        List<WalletTransaction> transactions = walletTransactionRepository
-                .findByWalletIdOrderByCreatedAtDesc(wallet.getId());
+                return transactions.stream()
+                                .map(this::mapToDto)
+                                .collect(Collectors.toList());
+        }
 
-        return transactions.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-    }
-
-    private LedgerEntryDto mapToDto(WalletTransaction transaction) {
-        return LedgerEntryDto.builder()
-                .id(transaction.getId())
-                .type(transaction.getType())
-                .amount(transaction.getAmount())
-                .description(transaction.getDescription())
-                .balanceAfter(transaction.getBalanceAfter())
-                .createdAt(transaction.getCreatedAt())
-                .build();
-    }
+        private LedgerEntryDto mapToDto(WalletTransaction transaction) {
+                return LedgerEntryDto.builder()
+                                .id(transaction.getId())
+                                .type(transaction.getType())
+                                .amount(transaction.getAmount())
+                                .description(transaction.getDescription())
+                                .balanceAfter(transaction.getBalanceAfter())
+                                .createdAt(transaction.getCreatedAt())
+                                .walletId(transaction.getWallet().getId())
+                                .build();
+        }
 }

@@ -19,4 +19,5 @@ public class LedgerEntryDto {
     private String description;
     private BigDecimal balanceAfter;
     private Instant createdAt;
+    private Long walletId;
 }
