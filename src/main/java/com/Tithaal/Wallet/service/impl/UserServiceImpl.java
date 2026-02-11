@@ -33,6 +33,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String registerUser(RegisterDto registerDto) {
+        if (registerDto.getUsername() == null || registerDto.getUsername().trim().isEmpty()) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Username cannot be null or empty!");
+        }
+        if (registerDto.getEmail() == null || registerDto.getEmail().trim().isEmpty()) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty!");
+        }
+        if (registerDto.getPassword() == null || registerDto.getPassword().trim().isEmpty()) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty!");
+        }
         if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
         }
@@ -76,6 +85,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String loginUser(LoginDto loginDto) {
+        if (loginDto.getUsernameOrEmail() == null || loginDto.getUsernameOrEmail().trim().isEmpty()) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Username or Email cannot be null or empty!");
+        }
+        if (loginDto.getPassword() == null || loginDto.getPassword().trim().isEmpty()) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty!");
+        }
+
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with username or email: " + loginDto.getUsernameOrEmail()));
@@ -136,13 +152,19 @@ public class UserServiceImpl implements UserService {
         if (updateDto.getPhoneNumber() != null) {
             user.setPhoneNumber(updateDto.getPhoneNumber());
         }
-        if (updateDto.getPassword() != null) {
+        if (updateDto.getPassword() != null && !updateDto.getPassword().trim().isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(updateDto.getPassword()));
         }
-        if (updateDto.getEmail() != null) {
+        if (updateDto.getEmail() != null && !updateDto.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(updateDto.getEmail())) {
+                throw new APIException(HttpStatus.BAD_REQUEST, "Email is already taken!");
+            }
             user.setEmail(updateDto.getEmail());
         }
-        if (updateDto.getUsername() != null) {
+        if (updateDto.getUsername() != null && !updateDto.getUsername().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(updateDto.getUsername())) {
+                throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
+            }
             user.setUsername(updateDto.getUsername());
         }
 
@@ -157,6 +179,12 @@ public class UserServiceImpl implements UserService {
                         "User not found with id: " + userId));
 
         java.util.List<Wallet> wallets = walletRepository.findByUser(user);
+        for (Wallet wallet : wallets) {
+            if (wallet.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                throw new APIException(HttpStatus.BAD_REQUEST,
+                        "Cannot delete user. Wallet with id " + wallet.getId() + " has active balance.");
+            }
+        }
         wallets.forEach(wallet -> {
             walletTransactionRepository.deleteAllByWallet(wallet);
             walletRepository.delete(wallet);
