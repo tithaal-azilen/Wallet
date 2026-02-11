@@ -7,21 +7,19 @@ import com.Tithaal.Wallet.dto.RegisterDto;
 import com.Tithaal.Wallet.dto.UpdateUserDto;
 import com.Tithaal.Wallet.dto.UserDetailDto;
 import com.Tithaal.Wallet.dto.UserSummaryDto;
-import com.Tithaal.Wallet.entity.User;
-import com.Tithaal.Wallet.entity.Wallet;
 
 public interface UserService {
-    User registerUser(RegisterDto registerDto);
+    String registerUser(RegisterDto registerDto);
 
-    Wallet addWallet(Long userId);
+    String loginUser(LoginDto loginDto);
 
-    User loginUser(LoginDto loginDto);
+    String addWallet(Long userId);
 
     List<UserSummaryDto> getAllUsers();
 
     UserDetailDto getUserDetails(Long userId);
 
-    User updateUser(Long userId, UpdateUserDto updateDto);
+    void updateUser(Long userId, UpdateUserDto updateDto);
 
     void deleteUser(Long userId);
 }

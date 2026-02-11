@@ -1,19 +1,24 @@
-2026-02-10T11:32:47.990+05:30  INFO 707713 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 707713 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
-2026-02-10T11:32:48.001+05:30  INFO 707713 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
-2026-02-10T11:32:49.087+05:30  INFO 707713 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-10T11:32:49.185+05:30  INFO 707713 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 82 ms. Found 3 JPA repository interfaces.
-2026-02-10T11:32:49.985+05:30  INFO 707713 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
-2026-02-10T11:32:50.005+05:30  INFO 707713 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-02-10T11:32:50.006+05:30  INFO 707713 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-02-10T11:32:50.075+05:30  INFO 707713 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1990 ms
-2026-02-10T11:32:50.295+05:30  INFO 707713 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-02-10T11:32:50.393+05:30  INFO 707713 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
-2026-02-10T11:32:51.100+05:30  INFO 707713 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-10T11:32:51.155+05:30  INFO 707713 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-02-10T11:32:51.596+05:30  INFO 707713 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2d593b56
-2026-02-10T11:32:51.598+05:30  INFO 707713 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-02-10T11:32:51.648+05:30  WARN 707713 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-02-10T11:32:51.680+05:30  INFO 707713 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-02-11T12:39:38.689+05:30  INFO 861180 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-11T12:39:38.721+05:30  INFO 861180 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-11T12:39:38.739+05:30  INFO 861180 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T12:39:38.751+05:30  INFO 861180 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-11T12:39:38.779+05:30  INFO 861180 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-11T12:39:54.529+05:30  INFO 925288 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 925288 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-02-11T12:39:54.534+05:30  INFO 925288 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-02-11T12:39:55.482+05:30  INFO 925288 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-11T12:39:55.565+05:30  INFO 925288 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 70 ms. Found 3 JPA repository interfaces.
+2026-02-11T12:39:56.273+05:30  INFO 925288 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-02-11T12:39:56.292+05:30  INFO 925288 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-11T12:39:56.293+05:30  INFO 925288 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-11T12:39:56.354+05:30  INFO 925288 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1754 ms
+2026-02-11T12:39:56.555+05:30  INFO 925288 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-11T12:39:56.632+05:30  INFO 925288 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-11T12:39:57.274+05:30  INFO 925288 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-11T12:39:57.327+05:30  INFO 925288 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-11T12:39:57.721+05:30  INFO 925288 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5a2f401a
+2026-02-11T12:39:57.723+05:30  INFO 925288 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-11T12:39:57.771+05:30  WARN 925288 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-11T12:39:57.803+05:30  INFO 925288 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
 	Database driver: PostgreSQL JDBC Driver
 	Database dialect: PostgreSQLDialect
@@ -25,87 +30,27 @@
 	Pool: DataSourceConnectionProvider
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-02-10T11:32:53.035+05:30  INFO 707713 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-10T11:32:53.161+05:30  INFO 707713 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-10T11:32:53.303+05:30  INFO 707713 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-02-10T11:32:53.742+05:30  WARN 707713 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-10T11:32:53.860+05:30  WARN 707713 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+2026-02-11T12:39:59.205+05:30  INFO 925288 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-11T12:39:59.330+05:30  INFO 925288 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T12:39:59.456+05:30  INFO 925288 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-11T12:39:59.862+05:30  WARN 925288 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-11T12:39:59.968+05:30  WARN 925288 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 9d40cb34-fe39-4fee-8b3e-c9d9ce4e0cab
-
-This generated password is for development use only. Your security configuration must be updated before running your application in production.
-
-2026-02-10T11:32:53.876+05:30  INFO 707713 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-02-10T11:32:54.570+05:30  INFO 707713 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
-2026-02-10T11:32:54.587+05:30  INFO 707713 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 7.289 seconds (process running for 7.848)
-2026-02-10T11:35:54.051+05:30  INFO 707713 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-02-10T11:35:54.051+05:30  INFO 707713 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-02-10T11:35:54.052+05:30  INFO 707713 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2026-02-10T11:37:53.281+05:30  WARN 707713 --- [Wallet] [http-nio-8081-exec-6] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
-2026-02-10T11:37:53.282+05:30  WARN 707713 --- [Wallet] [http-nio-8081-exec-6] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "wallet_user_id_key"
-  Detail: Key (user_id)=(7) already exists.
-2026-02-10T11:41:56.059+05:30  INFO 707713 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-2026-02-10T11:41:56.064+05:30  INFO 707713 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-2026-02-10T11:41:56.074+05:30  INFO 707713 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-02-10T11:41:56.078+05:30  INFO 707713 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-02-10T11:41:56.091+05:30  INFO 707713 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2026-02-10T11:42:19.021+05:30  INFO 712119 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.17 with PID 712119 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
-2026-02-10T11:42:19.025+05:30  INFO 712119 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
-2026-02-10T11:42:19.684+05:30  INFO 712119 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-10T11:42:19.735+05:30  INFO 712119 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 43 ms. Found 3 JPA repository interfaces.
-2026-02-10T11:42:20.160+05:30  INFO 712119 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
-2026-02-10T11:42:20.171+05:30  INFO 712119 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-02-10T11:42:20.171+05:30  INFO 712119 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
-2026-02-10T11:42:20.211+05:30  INFO 712119 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1134 ms
-2026-02-10T11:42:20.351+05:30  INFO 712119 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-02-10T11:42:20.391+05:30  INFO 712119 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
-2026-02-10T11:42:20.734+05:30  INFO 712119 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-10T11:42:20.761+05:30  INFO 712119 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-02-10T11:42:20.999+05:30  INFO 712119 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@45ad3cd8
-2026-02-10T11:42:21.000+05:30  INFO 712119 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-02-10T11:42:21.031+05:30  WARN 712119 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-02-10T11:42:21.050+05:30  INFO 712119 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
-	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
-	Database driver: PostgreSQL JDBC Driver
-	Database dialect: PostgreSQLDialect
-	Database version: 16.11
-	Default catalog/schema: springboot_db/public
-	Autocommit mode: undefined/unknown
-	Isolation level: READ_COMMITTED [default READ_COMMITTED]
-	JDBC fetch size: none
-	Pool: DataSourceConnectionProvider
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-02-10T11:42:21.843+05:30  INFO 712119 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-10T11:42:21.910+05:30  INFO 712119 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-10T11:42:21.979+05:30  INFO 712119 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-02-10T11:42:22.202+05:30  WARN 712119 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-10T11:42:22.267+05:30  WARN 712119 --- [Wallet] [main] .s.a.UserDetailsServiceAutoConfiguration : 
-
-Using generated security password: 382cd620-f544-4493-ae9a-a628e0cc8c49
+Using generated security password: e379bc11-68c4-42ff-b6d4-36dc0df726d2
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-02-10T11:42:22.280+05:30  INFO 712119 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-02-10T11:42:22.613+05:30  INFO 712119 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
-2026-02-10T11:42:22.618+05:30  INFO 712119 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 3.975 seconds (process running for 4.261)
-2026-02-10T11:42:33.789+05:30  INFO 712119 --- [Wallet] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-02-10T11:42:33.789+05:30  INFO 712119 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-02-10T11:42:33.790+05:30  INFO 712119 --- [Wallet] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2026-02-10T11:42:33.914+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-2] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
-2026-02-10T11:42:33.914+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-2] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "wallet_user_id_key"
-  Detail: Key (user_id)=(7) already exists.
-2026-02-10T11:42:35.077+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
-2026-02-10T11:42:35.077+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-4] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "wallet_user_id_key"
-  Detail: Key (user_id)=(7) already exists.
-2026-02-10T11:44:24.542+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-6] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
-2026-02-10T11:44:24.542+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-6] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "wallet_user_id_key"
-  Detail: Key (user_id)=(1) already exists.
-2026-02-10T11:47:06.071+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
-2026-02-10T11:47:06.071+05:30  WARN 712119 --- [Wallet] [http-nio-8081-exec-7] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "ukhgee4p1hiwadqinr0avxlq4eb"
-  Detail: Key (user_id)=(7) already exists.
-2026-02-10T12:06:24.477+05:30  INFO 712119 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-2026-02-10T12:06:24.480+05:30  INFO 712119 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-2026-02-10T12:06:24.487+05:30  INFO 712119 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-02-10T12:06:24.490+05:30  INFO 712119 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-02-10T12:06:24.505+05:30  INFO 712119 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-11T12:39:59.978+05:30  INFO 925288 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-02-11T12:40:00.544+05:30  INFO 925288 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-02-11T12:40:00.553+05:30  INFO 925288 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 6.718 seconds (process running for 7.38)
+2026-02-11T12:41:27.426+05:30  INFO 925288 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-11T12:41:27.427+05:30  INFO 925288 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-11T12:41:27.434+05:30  INFO 925288 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2026-02-11T12:43:48.758+05:30  WARN 925288 --- [Wallet] [http-nio-8081-exec-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
+2026-02-11T12:43:48.759+05:30  WARN 925288 --- [Wallet] [http-nio-8081-exec-4] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "users_username_key"
+  Detail: Key (username)=(TithaalSheth) already exists.
+2026-02-11T12:49:44.662+05:30  INFO 925288 --- [Wallet] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-11T12:49:44.670+05:30  INFO 925288 --- [Wallet] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-02-11T12:49:44.685+05:30  INFO 925288 --- [Wallet] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T12:49:44.694+05:30  INFO 925288 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-11T12:49:44.734+05:30  INFO 925288 --- [Wallet] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

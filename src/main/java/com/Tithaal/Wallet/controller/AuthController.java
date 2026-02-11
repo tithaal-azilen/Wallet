@@ -18,13 +18,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
-        userService.registerUser(registerDto);
-        return new ResponseEntity<>("User Registered Successfully!", HttpStatus.CREATED);
+        String result = userService.registerUser(registerDto);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
-        userService.loginUser(loginDto);
-        return new ResponseEntity<>("User Logged In Successfully!", HttpStatus.OK);
+        String result = userService.loginUser(loginDto);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

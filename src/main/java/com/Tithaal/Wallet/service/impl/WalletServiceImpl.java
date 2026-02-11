@@ -26,7 +26,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public Wallet creditWallet(Long walletId, CreditRequestDto creditRequestDto) {
+    public String TopUpWallet(Long walletId, CreditRequestDto creditRequestDto) {
         if (creditRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Amount must be greater than 0");
         }
@@ -48,12 +48,16 @@ public class WalletServiceImpl implements WalletService {
 
         walletTransactionRepository.save(transaction);
 
-        return savedWallet;
+        if (savedWallet != null && transaction != null) {
+            return "Wallet TopUp successfully ";
+        } else {
+            return "Wallet TopUp failed!";
+        }
     }
 
     @Override
     @Transactional
-    public Wallet transferFunds(DebitRequestDto debitRequestDto) {
+    public String Transfer(DebitRequestDto debitRequestDto) {
         if (debitRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Amount must be greater than 0");
         }
@@ -102,7 +106,12 @@ public class WalletServiceImpl implements WalletService {
                 .build();
         walletTransactionRepository.save(recipientTransaction);
 
-        return savedSenderWallet;
+        if (savedSenderWallet != null && savedRecipientWallet != null && senderTransaction != null
+                && recipientTransaction != null) {
+            return "Transfer Successful! ";
+        } else {
+            return "Transfer Failed!";
+        }
     }
 
     @Override

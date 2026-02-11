@@ -1,9 +1,9 @@
 package com.Tithaal.Wallet.service.impl;
 
-import com.Tithaal.Wallet.dto.LedgerEntryDto;
+import com.Tithaal.Wallet.dto.WalletTransactionEntryDto;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
-import com.Tithaal.Wallet.service.LedgerService;
+import com.Tithaal.Wallet.service.WalletHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class LedgerServiceImpl implements LedgerService {
+public class WalletHistoryServiceImpl implements WalletHistoryService {
 
         private final WalletTransactionRepository walletTransactionRepository;
 
         @Override
-        public List<LedgerEntryDto> getUserLedger(Long userId) {
+        public List<WalletTransactionEntryDto> getUserHistory(Long userId) {
                 List<WalletTransaction> transactions = walletTransactionRepository
                                 .findAllByWalletUserIdOrderByCreatedAtDesc(userId);
 
@@ -26,8 +26,8 @@ public class LedgerServiceImpl implements LedgerService {
                                 .collect(Collectors.toList());
         }
 
-        private LedgerEntryDto mapToDto(WalletTransaction transaction) {
-                return LedgerEntryDto.builder()
+        private WalletTransactionEntryDto mapToDto(WalletTransaction transaction) {
+                return WalletTransactionEntryDto.builder()
                                 .id(transaction.getId())
                                 .type(transaction.getType())
                                 .amount(transaction.getAmount())
@@ -36,5 +36,15 @@ public class LedgerServiceImpl implements LedgerService {
                                 .createdAt(transaction.getCreatedAt())
                                 .walletId(transaction.getWallet().getId())
                                 .build();
+        }
+
+        @Override
+        public List<WalletTransactionEntryDto> getWalletHistory(Long walletId) {
+                List<WalletTransaction> transactions = walletTransactionRepository
+                                .findAllByWalletIdOrderByCreatedAtDesc(walletId);
+
+                return transactions.stream()
+                                .map(this::mapToDto)
+                                .collect(Collectors.toList());
         }
 }

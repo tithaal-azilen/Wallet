@@ -12,7 +12,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LedgerEntryDto {
+public class WalletTransactionEntryDto {
     private Long id;
     private String type;
     private BigDecimal amount;

@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User registerUser(RegisterDto registerDto) {
+    public String registerUser(RegisterDto registerDto) {
         if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
         }
@@ -49,22 +49,15 @@ public class UserServiceImpl implements UserService {
                 .createdAt(Instant.now())
                 .build();
 
-        User savedUser = userRepository.save(user);
-
-        Wallet wallet = Wallet.builder()
-                .user(savedUser)
-                .balance(BigDecimal.ZERO)
-                .createdAt(Instant.now())
-                .build();
-
-        walletRepository.save(wallet);
-
-        return savedUser;
+        if (userRepository.save(user) != null) {
+            return "User Registered Successfully!";
+        } else {
+            return "User Registration Failed!";
+        }
     }
 
     @Override
-    @Transactional
-    public Wallet addWallet(Long userId) {
+    public String addWallet(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "User not found with id: " + userId));
 
@@ -74,11 +67,15 @@ public class UserServiceImpl implements UserService {
                 .createdAt(Instant.now())
                 .build();
 
-        return walletRepository.save(wallet);
+        if (walletRepository.save(wallet) != null) {
+            return "Wallet Added Successfully!";
+        } else {
+            return "Wallet Addition Failed!";
+        }
     }
 
     @Override
-    public User loginUser(LoginDto loginDto) {
+    public String loginUser(LoginDto loginDto) {
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with username or email: " + loginDto.getUsernameOrEmail()));
@@ -87,7 +84,7 @@ public class UserServiceImpl implements UserService {
             throw new APIException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
 
-        return user;
+        return "User Logged In Successfully!";
     }
 
     @Override
@@ -128,7 +125,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, UpdateUserDto updateDto) {
+    public void updateUser(Long userId, UpdateUserDto updateDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with id: " + userId));
@@ -149,7 +146,7 @@ public class UserServiceImpl implements UserService {
             user.setUsername(updateDto.getUsername());
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override

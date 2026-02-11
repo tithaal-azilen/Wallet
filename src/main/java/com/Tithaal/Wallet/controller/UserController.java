@@ -43,7 +43,7 @@ public class UserController {
 
     @PostMapping("/{id}/addwallet")
     public ResponseEntity<String> addWallet(@PathVariable Long id) {
-        userService.addWallet(id);
-        return new ResponseEntity<>("Wallet Added Successfully!", HttpStatus.CREATED);
+        String result = userService.addWallet(id);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 }
