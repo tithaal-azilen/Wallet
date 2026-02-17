@@ -38,22 +38,25 @@ class WalletServiceImplTest {
     @Test
     void TopUpWallet_Success() {
         Long walletId = 1L;
+        Long userId = 100L;
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.TEN);
         creditDto.setCreditCardNumber("1234567890123456");
 
+        User user = new User();
+        user.setId(userId);
+
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
+        wallet.setUser(user);
         wallet.setBalance(BigDecimal.ZERO);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
-        when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Returns
-                                                                                                            // the
-                                                                                                            // wallet
-                                                                                                            // passed
+        when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
-        String result = walletService.TopUpWallet(walletId, creditDto);
+        String result = walletService.TopUpWallet(walletId, creditDto, userId);
 
         assertEquals("Wallet TopUp successfully ", result);
         assertEquals(BigDecimal.TEN, wallet.getBalance());
@@ -64,22 +67,38 @@ class WalletServiceImplTest {
     @Test
     void TopUpWallet_Fail_InvalidAmount() {
         Long walletId = 1L;
+        Long userId = 100L;
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.ZERO);
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.TopUpWallet(walletId, creditDto));
+        // We need wallet mock for verification if it's called before amount check?
+        // Logic: validateWalletOwnership -> amount check.
+        // So we need to mock wallet finding first.
+
+        User user = new User();
+        user.setId(userId);
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setUser(user);
+
+        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+
+        APIException exception = assertThrows(APIException.class,
+                () -> walletService.TopUpWallet(walletId, creditDto, userId));
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
     @Test
     void TopUpWallet_Fail_WalletNotFound() {
         Long walletId = 1L;
+        Long userId = 100L;
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.TEN);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.TopUpWallet(walletId, creditDto));
+        APIException exception = assertThrows(APIException.class,
+                () -> walletService.TopUpWallet(walletId, creditDto, userId));
         assertTrue(exception.getMessage().contains("Wallet not found"));
     }
 
@@ -87,13 +106,18 @@ class WalletServiceImplTest {
 
     @Test
     void Transfer_Success() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
         debitDto.setAmount(BigDecimal.TEN);
 
+        User user = new User();
+        user.setId(userId);
+
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
+        senderWallet.setUser(user);
         senderWallet.setBalance(new BigDecimal("100"));
 
         Wallet recipientWallet = new Wallet();
@@ -105,7 +129,7 @@ class WalletServiceImplTest {
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
-        String result = walletService.Transfer(debitDto);
+        String result = walletService.Transfer(debitDto, userId);
 
         assertEquals("Transfer Successful! ", result);
         assertEquals(new BigDecimal("90"), senderWallet.getBalance());
@@ -117,26 +141,46 @@ class WalletServiceImplTest {
 
     @Test
     void Transfer_Fail_InvalidAmount() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
+        debitDto.setSendingWalletId(1L);
         debitDto.setAmount(BigDecimal.ZERO);
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto));
+        User user = new User();
+        user.setId(userId);
+        Wallet senderWallet = new Wallet();
+        senderWallet.setId(1L);
+        senderWallet.setUser(user);
+
+        when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
+
+        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
     @Test
     void Transfer_Fail_SameWallet() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(1L);
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto));
+        User user = new User();
+        user.setId(userId);
+        Wallet senderWallet = new Wallet();
+        senderWallet.setId(1L);
+        senderWallet.setUser(user);
+
+        when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
+
+        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Cannot transfer funds to the same wallet", exception.getMessage());
     }
 
     @Test
     void Transfer_Fail_SenderWalletNotFound() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
@@ -144,36 +188,50 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto));
-        assertTrue(exception.getMessage().contains("Sender wallet not found"));
+        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        // Expect "Wallet not found" because validateOwnership calls findById first and
+        // throws "Wallet not found"
+        // The original test expected "Sender wallet not found", but validateOwnership
+        // runs first now.
+        assertTrue(exception.getMessage().contains("Wallet not found"));
     }
 
     @Test
     void Transfer_Fail_RecipientWalletNotFound() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
 
+        User user = new User();
+        user.setId(userId);
+
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
+        senderWallet.setUser(user);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findById(2L)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto));
+        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
         assertTrue(exception.getMessage().contains("Recipient wallet not found"));
     }
 
     @Test
     void Transfer_Fail_InsufficientBalance() {
+        Long userId = 100L;
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(new BigDecimal("100"));
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
 
+        User user = new User();
+        user.setId(userId);
+
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
+        senderWallet.setUser(user);
         senderWallet.setBalance(BigDecimal.TEN); // 10 < 100
 
         Wallet recipientWallet = new Wallet();
@@ -182,7 +240,7 @@ class WalletServiceImplTest {
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findById(2L)).thenReturn(Optional.of(recipientWallet));
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto));
+        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Insufficient balance", exception.getMessage());
     }
 
