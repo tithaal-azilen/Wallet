@@ -9,4 +9,6 @@ public interface WalletService {
     String Transfer(DebitRequestDto debitRequestDto, Long userId);
 
     void validateWalletOwnership(Long walletId, Long userId);
+
+    void deductMonthlyFees();
 }
