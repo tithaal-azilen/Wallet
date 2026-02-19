@@ -1,5 +1,6 @@
 package com.Tithaal.Wallet.controller;
 
+import com.Tithaal.Wallet.dto.ApiResponse;
 import com.Tithaal.Wallet.dto.CreditRequestDto;
 import com.Tithaal.Wallet.dto.DebitRequestDto;
 import com.Tithaal.Wallet.service.WalletService;
@@ -20,17 +21,18 @@ public class WalletController {
 
         @PostMapping("/{walletId}/payment")
         @PreAuthorize("#userId == principal.id")
-        public ResponseEntity<String> processPayment(@PathVariable Long userId, @PathVariable Long walletId,
+        public ResponseEntity<ApiResponse<String>> processPayment(@PathVariable Long userId,
+                        @PathVariable Long walletId,
                         @Valid @RequestBody CreditRequestDto creditRequestDto) {
                 String result = walletService.TopUpWallet(walletId, creditRequestDto, userId);
-                return ResponseEntity.ok(result);
+                return ResponseEntity.ok(new ApiResponse<>(true, result, null));
         }
 
         @PostMapping("/transfer")
         @PreAuthorize("#userId == principal.id")
-        public ResponseEntity<String> transferMoney(@PathVariable Long userId,
+        public ResponseEntity<ApiResponse<String>> transferMoney(@PathVariable Long userId,
                         @Valid @RequestBody DebitRequestDto debitRequestDto) {
                 String result = walletService.Transfer(debitRequestDto, userId);
-                return ResponseEntity.ok(result);
+                return ResponseEntity.ok(new ApiResponse<>(true, result, null));
         }
 }

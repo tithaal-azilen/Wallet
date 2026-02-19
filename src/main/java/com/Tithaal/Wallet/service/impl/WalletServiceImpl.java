@@ -4,6 +4,7 @@ import com.Tithaal.Wallet.dto.CreditRequestDto;
 import com.Tithaal.Wallet.dto.DebitRequestDto;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
+import com.Tithaal.Wallet.entity.TransactionType;
 import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
@@ -36,12 +37,12 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Wallet not found with id: " + walletId));
 
-        wallet.setBalance(wallet.getBalance().add(creditRequestDto.getAmount()));
+        wallet.credit(creditRequestDto.getAmount());
         Wallet savedWallet = walletRepository.save(wallet);
 
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(savedWallet)
-                .type("CREDIT")
+                .type(TransactionType.CREDIT)
                 .amount(creditRequestDto.getAmount())
                 .description("Wallet credited using credit card number: " + creditRequestDto.getCreditCardNumber())
                 .balanceAfter(savedWallet.getBalance())
@@ -83,12 +84,12 @@ public class WalletServiceImpl implements WalletService {
         }
 
         // Debit sender
-        senderWallet.setBalance(senderWallet.getBalance().subtract(debitRequestDto.getAmount()));
+        senderWallet.debit(debitRequestDto.getAmount());
         Wallet savedSenderWallet = walletRepository.save(senderWallet);
 
         WalletTransaction senderTransaction = WalletTransaction.builder()
                 .wallet(savedSenderWallet)
-                .type("DEBIT")
+                .type(TransactionType.DEBIT)
                 .amount(debitRequestDto.getAmount())
                 .description("Transfer to wallet id: " + debitRequestDto.getReceivingWalletId())
                 .balanceAfter(savedSenderWallet.getBalance())
@@ -97,12 +98,12 @@ public class WalletServiceImpl implements WalletService {
         walletTransactionRepository.save(senderTransaction);
 
         // Credit recipient
-        recipientWallet.setBalance(recipientWallet.getBalance().add(debitRequestDto.getAmount()));
+        recipientWallet.credit(debitRequestDto.getAmount());
         Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
 
         WalletTransaction recipientTransaction = WalletTransaction.builder()
                 .wallet(savedRecipientWallet)
-                .type("CREDIT")
+                .type(TransactionType.CREDIT)
                 .amount(debitRequestDto.getAmount())
                 .description("Transfer from wallet id: " + debitRequestDto.getSendingWalletId())
                 .balanceAfter(savedRecipientWallet.getBalance())

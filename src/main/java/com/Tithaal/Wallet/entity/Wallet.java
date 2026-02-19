@@ -36,4 +36,21 @@ public class Wallet {
 
     @Column(name = "last_deduction_attempt")
     private java.time.LocalDate lastDeductionAttempt;
+
+    public void credit(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Credit amount must be greater than zero");
+        }
+        this.balance = this.balance.add(amount);
+    }
+
+    public void debit(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Debit amount must be greater than zero");
+        }
+        if (this.balance.compareTo(amount) < 0) {
+            throw new IllegalStateException("Insufficient balance");
+        }
+        this.balance = this.balance.subtract(amount);
+    }
 }

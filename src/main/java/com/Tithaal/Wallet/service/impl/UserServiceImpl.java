@@ -12,6 +12,8 @@ import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.UserService;
 import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.event.WalletCreatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Override
     public String addWallet(Long userId) {
         User user = userRepository.findById(userId)
@@ -77,8 +81,11 @@ public class UserServiceImpl implements UserService {
                 .nextDeductionDate(calculateNextDeductionDate())
                 .build();
 
-        if (walletRepository.save(wallet) != null) {
-            return "Wallet Added Successfully!";
+        Wallet savedWallet = walletRepository.save(wallet);
+
+        if (savedWallet != null) {
+            eventPublisher.publishEvent(new WalletCreatedEvent(this, user.getEmail(), savedWallet.getId()));
+            return "Wallet Added Successfully! with wallet id: " + savedWallet.getId();
         } else {
             return "Wallet Addition Failed!";
         }

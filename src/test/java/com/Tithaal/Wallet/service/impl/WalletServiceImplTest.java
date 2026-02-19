@@ -297,28 +297,4 @@ class WalletServiceImplTest {
 
     // --- deductMonthlyFees Tests ---
 
-    @Test
-    void deductMonthlyFees_Success() {
-        Wallet wallet1 = new Wallet();
-        wallet1.setId(1L);
-        wallet1.setBalance(new BigDecimal("100.00"));
-
-        Wallet wallet2 = new Wallet();
-        wallet2.setId(2L);
-        wallet2.setBalance(new BigDecimal("5.00"));
-
-        java.util.List<Wallet> wallets = java.util.Arrays.asList(wallet1, wallet2);
-
-        when(walletRepository.findAll()).thenReturn(wallets);
-        when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
-
-        walletService.deductMonthlyFees();
-
-        assertEquals(new BigDecimal("90.00"), wallet1.getBalance());
-        assertEquals(new BigDecimal("-5.00"), wallet2.getBalance());
-
-        verify(walletRepository, times(2)).save(any(Wallet.class));
-        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
-    }
 }

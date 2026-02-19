@@ -2,8 +2,11 @@ package com.Tithaal.Wallet.service;
 
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
+import com.Tithaal.Wallet.entity.TransactionType;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
+import com.Tithaal.Wallet.event.FeeDeductedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +29,7 @@ public class FeeDeductionService {
 
     private final WalletRepository walletRepository;
     private final WalletTransactionRepository walletTransactionRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${wallet.monthly.fee.amount}")
     private BigDecimal monthlyFeeAmount;
@@ -76,7 +80,7 @@ public class FeeDeductionService {
             return;
         }
 
-        wallet.setBalance(wallet.getBalance().subtract(monthlyFeeAmount));
+        wallet.debit(monthlyFeeAmount);
 
         LocalDate currentDeductionDate = wallet.getNextDeductionDate();
         wallet.setNextDeductionDate(currentDeductionDate.plusMonths(1));
@@ -88,7 +92,7 @@ public class FeeDeductionService {
 
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(savedWallet)
-                .type("DEBIT")
+                .type(TransactionType.DEBIT)
                 .amount(monthlyFeeAmount)
                 .description("Monthly Maintenance Fee for "
                         + currentDeductionDate.format(DateTimeFormatter.ofPattern("MMM yyyy")))
@@ -99,5 +103,14 @@ public class FeeDeductionService {
 
         walletTransactionRepository.save(transaction);
         log.info("Deducted fee for wallet {}. New Balance: {}", walletId, savedWallet.getBalance());
+
+        // Publish event
+        if (savedWallet.getUser() != null && savedWallet.getUser().getEmail() != null) {
+            eventPublisher.publishEvent(new FeeDeductedEvent(this,
+                    savedWallet.getUser().getEmail(),
+                    walletId,
+                    monthlyFeeAmount,
+                    today));
+        }
     }
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.Tithaal.Wallet.entity.TransactionType;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -14,7 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class WalletTransactionEntryDto {
     private Long id;
-    private String type;
+    private TransactionType type;
     private BigDecimal amount;
     private String description;
     private BigDecimal balanceAfter;

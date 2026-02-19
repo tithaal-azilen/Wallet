@@ -25,8 +25,9 @@ public class WalletTransaction {
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type; // CREDIT / DEBIT
+    private TransactionType type; // CREDIT / DEBIT
 
     @Column(nullable = false)
     private BigDecimal amount;
