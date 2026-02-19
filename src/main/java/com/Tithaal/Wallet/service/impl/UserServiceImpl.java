@@ -74,6 +74,7 @@ public class UserServiceImpl implements UserService {
                 .user(user)
                 .balance(BigDecimal.ZERO)
                 .createdAt(Instant.now())
+                .nextDeductionDate(calculateNextDeductionDate())
                 .build();
 
         if (walletRepository.save(wallet) != null) {
@@ -190,5 +191,22 @@ public class UserServiceImpl implements UserService {
             walletRepository.delete(wallet);
         });
         userRepository.delete(user);
+    }
+
+    private java.time.LocalDate calculateNextDeductionDate() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        int dayOfMonth = today.getDayOfMonth();
+        java.time.LocalDate nextDeductionDate;
+
+        if (dayOfMonth <= 7) {
+            nextDeductionDate = today.withDayOfMonth(1).plusMonths(1);
+        } else if (dayOfMonth <= 14) {
+            nextDeductionDate = today.withDayOfMonth(8).plusMonths(1);
+        } else if (dayOfMonth <= 21) {
+            nextDeductionDate = today.withDayOfMonth(15).plusMonths(1);
+        } else {
+            nextDeductionDate = today.withDayOfMonth(22).plusMonths(1);
+        }
+        return nextDeductionDate;
     }
 }

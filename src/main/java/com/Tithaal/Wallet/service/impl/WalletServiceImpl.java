@@ -128,27 +128,4 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
-    @Override
-    @Transactional
-    @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 0 1 * ?")
-    public void deductMonthlyFees() {
-        java.util.List<Wallet> wallets = walletRepository.findAll();
-        BigDecimal fee = new BigDecimal("10.00");
-
-        for (Wallet wallet : wallets) {
-            wallet.setBalance(wallet.getBalance().subtract(fee));
-            Wallet savedWallet = walletRepository.save(wallet);
-
-            WalletTransaction transaction = WalletTransaction.builder()
-                    .wallet(savedWallet)
-                    .type("DEBIT")
-                    .amount(fee)
-                    .description("Monthly Maintenance Fee")
-                    .balanceAfter(savedWallet.getBalance())
-                    .createdAt(Instant.now())
-                    .build();
-
-            walletTransactionRepository.save(transaction);
-        }
-    }
 }

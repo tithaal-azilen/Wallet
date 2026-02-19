@@ -10,5 +10,4 @@ public interface WalletService {
 
     void validateWalletOwnership(Long walletId, Long userId);
 
-    void deductMonthlyFees();
 }

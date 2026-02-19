@@ -7,7 +7,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "wallet_transaction")
+@Table(name = "wallet_transaction", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "wallet_id", "reference_id" })
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,6 +35,9 @@ public class WalletTransaction {
 
     @Column(name = "balance_after", nullable = false)
     private BigDecimal balanceAfter;
+
+    @Column(name = "reference_id")
+    private String referenceId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
