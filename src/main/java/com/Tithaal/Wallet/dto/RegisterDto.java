@@ -10,14 +10,18 @@ public class RegisterDto {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @jakarta.validation.constraints.Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must be alphanumeric")
     private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "provide valid email")
+    @jakarta.validation.constraints.Pattern(regexp = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$", message = "Invalid email format")
     private String email;
 
+    @NotBlank(message = "City is required")
     private String city;
 
+    @jakarta.validation.constraints.Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
     private String phoneNumber;
 
     @NotBlank(message = "Password is required")
