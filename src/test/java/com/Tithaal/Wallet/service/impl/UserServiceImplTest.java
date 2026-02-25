@@ -2,6 +2,7 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.*;
 import com.Tithaal.Wallet.entity.User;
+import com.Tithaal.Wallet.entity.UserStatus;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.UserRepository;
@@ -128,7 +129,7 @@ class UserServiceImplTest {
 
         String result = userService.addWallet(userId);
 
-        assertEquals("Wallet Added Successfully!", result);
+        assertEquals("Wallet Added Successfully! with wallet id: null", result);
         verify(walletRepository).save(any(Wallet.class));
     }
 
@@ -338,9 +339,8 @@ class UserServiceImplTest {
 
         userService.deleteUser(userId);
 
-        verify(walletTransactionRepository).deleteAllByWallet(wallet);
-        verify(walletRepository).delete(wallet);
-        verify(userRepository).delete(user);
+        assertEquals(UserStatus.INACTIVE, user.getStatus());
+        verify(userRepository).save(user);
     }
 
     @Test

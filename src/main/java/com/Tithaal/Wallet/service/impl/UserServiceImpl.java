@@ -9,10 +9,13 @@ import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletRepository;
-import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.UserService;
 import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.event.WalletCreatedEvent;
+import com.Tithaal.Wallet.entity.Organization;
+import com.Tithaal.Wallet.entity.Role;
+import com.Tithaal.Wallet.entity.UserStatus;
+import com.Tithaal.Wallet.repository.OrganizationRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +32,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
-    private final WalletTransactionRepository walletTransactionRepository;
+    private final OrganizationRepository organizationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -57,8 +61,16 @@ public class UserServiceImpl implements UserService {
                 .city(registerDto.getCity())
                 .phoneNumber(registerDto.getPhoneNumber())
                 .passwordHash(passwordEncoder.encode(registerDto.getPassword()))
+                .role(Role.ROLE_USER)
+                .status(UserStatus.ACTIVE)
                 .createdAt(Instant.now())
                 .build();
+
+        if (registerDto.getOrgCode() != null && !registerDto.getOrgCode().trim().isEmpty()) {
+            Organization organization = organizationRepository.findByOrgCode(registerDto.getOrgCode())
+                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Invalid organization code!"));
+            user.setOrganization(organization);
+        }
 
         if (userRepository.save(user) != null) {
             return "User Registered Successfully!";
@@ -66,8 +78,6 @@ public class UserServiceImpl implements UserService {
             return "User Registration Failed!";
         }
     }
-
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public String addWallet(Long userId) {
@@ -103,6 +113,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
                 .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
                         "User not found with username or email: " + loginDto.getUsernameOrEmail()));
+
+        if (user.getStatus() == UserStatus.INACTIVE) {
+            throw new APIException(HttpStatus.FORBIDDEN, "Account is disabled. Please contact support.");
+        }
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Invalid password!");
@@ -193,11 +207,8 @@ public class UserServiceImpl implements UserService {
                         "Cannot delete user. Wallet with id " + wallet.getId() + " has active balance.");
             }
         }
-        wallets.forEach(wallet -> {
-            walletTransactionRepository.deleteAllByWallet(wallet);
-            walletRepository.delete(wallet);
-        });
-        userRepository.delete(user);
+        user.setStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
     }
 
     private java.time.LocalDate calculateNextDeductionDate() {
