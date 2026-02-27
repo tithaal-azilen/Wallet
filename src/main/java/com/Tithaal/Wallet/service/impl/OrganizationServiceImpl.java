@@ -2,7 +2,7 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.OrganizationDto;
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
-import com.Tithaal.Wallet.dto.WalletTransactionEntryDto;
+import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.entity.*;
 import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
@@ -10,6 +10,7 @@ import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrganizationServiceImpl implements OrganizationService {
@@ -80,7 +82,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public void deleteOrganization(Long orgId) {
+    public void deleteOrganization(Long orgId, Long adminId) {
+        validateAdminOwnership(orgId, adminId);
         Organization organization = organizationRepository.findById(orgId)
                 .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Organization not found"));
         organization.setStatus(OrganizationStatus.DELETED);
@@ -88,27 +91,34 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Page<WalletTransactionEntryDto> getOrganizationTransactions(Long orgId, String adminUsername,
+    public Page<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId,
             Pageable pageable) {
-        User admin = userRepository.findByUsername(adminUsername)
-                .orElseThrow(() -> new APIException(HttpStatus.UNAUTHORIZED, "Admin user not found"));
-
-        if (admin.getOrganization() == null || !admin.getOrganization().getId().equals(orgId)) {
-            throw new APIException(HttpStatus.FORBIDDEN,
-                    "You do not have permission to view transactions for this organization");
-        }
+        validateAdminOwnership(orgId, adminId);
 
         Page<WalletTransaction> transactions = walletTransactionRepository.findByOrganizationId(orgId, pageable);
 
-        return transactions.map(t -> WalletTransactionEntryDto.builder()
+        return transactions.map(t -> OrganizationTransactionDto.builder()
                 .id(t.getId())
                 .description(t.getDescription())
                 .amount(t.getAmount())
                 .type(t.getType())
                 .balanceAfter(t.getBalanceAfter())
                 .walletId(t.getWallet().getId())
+                .userId(t.getWallet().getUser().getId())
+                .username(t.getWallet().getUser().getUsername())
                 .createdAt(t.getCreatedAt())
                 .build());
+    }
+
+    private void validateAdminOwnership(Long orgId, Long adminId) {
+        log.info("Validating admin ownership for orgId: " + orgId + " and adminId: " + adminId);
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new APIException(HttpStatus.UNAUTHORIZED, "Admin user not found"));
+
+        if (admin.getOrganization() == null || !admin.getOrganization().getId().equals(orgId)) {
+            throw new APIException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to access this organization");
+        }
     }
 
     private OrganizationDto mapToDto(Organization organization) {

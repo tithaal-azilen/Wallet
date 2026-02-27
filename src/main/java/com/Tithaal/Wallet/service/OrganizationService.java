@@ -2,7 +2,7 @@ package com.Tithaal.Wallet.service;
 
 import com.Tithaal.Wallet.dto.OrganizationDto;
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
-import com.Tithaal.Wallet.dto.WalletTransactionEntryDto;
+import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +11,7 @@ public interface OrganizationService {
 
     OrganizationDto getOrganization(Long orgId);
 
-    void deleteOrganization(Long orgId);
+    void deleteOrganization(Long orgId, Long adminId);
 
-    Page<WalletTransactionEntryDto> getOrganizationTransactions(Long orgId, String adminUsername, Pageable pageable);
+    Page<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId, Pageable pageable);
 }

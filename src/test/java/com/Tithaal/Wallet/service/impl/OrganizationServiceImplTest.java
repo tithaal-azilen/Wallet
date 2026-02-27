@@ -1,7 +1,7 @@
 package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
-import com.Tithaal.Wallet.dto.WalletTransactionEntryDto;
+import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.entity.*;
 import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
@@ -85,7 +85,7 @@ public class OrganizationServiceImplTest {
         String orgCode = organizationService.registerOrganizationAndAdmin(dto);
 
         assertNotNull(orgCode);
-        assertTrue(orgCode.startsWith("ORG-"));
+        assertTrue(orgCode.startsWith("NEW"));
         verify(organizationRepository).save(any(Organization.class));
         verify(userRepository).save(any(User.class));
     }
@@ -101,37 +101,41 @@ public class OrganizationServiceImplTest {
 
         Wallet wallet = new Wallet();
         wallet.setId(1L);
+        wallet.setUser(testAdmin);
         transaction.setWallet(wallet);
 
         Page<WalletTransaction> page = new PageImpl<>(List.of(transaction));
 
-        when(userRepository.findByUsername(testAdmin.getUsername())).thenReturn(Optional.of(testAdmin));
+        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
         when(walletTransactionRepository.findByOrganizationId(eq(testOrg.getId()), any(Pageable.class)))
                 .thenReturn(page);
 
-        Page<WalletTransactionEntryDto> result = organizationService.getOrganizationTransactions(testOrg.getId(),
-                testAdmin.getUsername(), Pageable.unpaged());
+        Page<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(testOrg.getId(),
+                testAdmin.getId(), Pageable.unpaged());
 
         assertEquals(1, result.getTotalElements());
         assertEquals(BigDecimal.TEN, result.getContent().get(0).getAmount());
+        assertEquals(testAdmin.getId(), result.getContent().get(0).getUserId());
+        assertEquals(testAdmin.getUsername(), result.getContent().get(0).getUsername());
     }
 
     @Test
     void getOrganizationTransactions_ForbiddenForWrongOrg() {
         Organization wrongOrg = Organization.builder().id(2L).build();
-        User wrongAdmin = User.builder().username("wrongAdmin").organization(wrongOrg).build();
+        User wrongAdmin = User.builder().id(2L).username("wrongAdmin").organization(wrongOrg).build();
 
-        when(userRepository.findByUsername(wrongAdmin.getUsername())).thenReturn(Optional.of(wrongAdmin));
+        when(userRepository.findById(wrongAdmin.getId())).thenReturn(Optional.of(wrongAdmin));
 
         assertThrows(APIException.class, () -> organizationService.getOrganizationTransactions(testOrg.getId(),
-                wrongAdmin.getUsername(), Pageable.unpaged()));
+                wrongAdmin.getId(), Pageable.unpaged()));
     }
 
     @Test
     void deleteOrganization_Success() {
+        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
         when(organizationRepository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
 
-        organizationService.deleteOrganization(testOrg.getId());
+        organizationService.deleteOrganization(testOrg.getId(), testAdmin.getId());
 
         assertEquals(OrganizationStatus.DELETED, testOrg.getStatus());
         verify(organizationRepository).save(testOrg);
