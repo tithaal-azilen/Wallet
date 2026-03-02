@@ -5,7 +5,7 @@ import com.Tithaal.Wallet.dto.DebitRequestDto;
 import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
-import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
 
-        APIException exception = assertThrows(APIException.class,
+        DomainException exception = assertThrows(DomainException.class,
                 () -> walletService.TopUpWallet(walletId, creditDto, userId));
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
@@ -97,7 +97,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class,
+        DomainException exception = assertThrows(DomainException.class,
                 () -> walletService.TopUpWallet(walletId, creditDto, userId));
         assertTrue(exception.getMessage().contains("Wallet not found"));
     }
@@ -154,7 +154,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
@@ -174,7 +174,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Cannot transfer funds to the same wallet", exception.getMessage());
     }
 
@@ -188,7 +188,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         // Expect "Wallet not found" because validateOwnership calls findById first and
         // throws "Wallet not found"
         // The original test expected "Sender wallet not found", but validateOwnership
@@ -214,7 +214,7 @@ class WalletServiceImplTest {
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findById(2L)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertTrue(exception.getMessage().contains("Recipient wallet not found"));
     }
 
@@ -240,7 +240,7 @@ class WalletServiceImplTest {
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findById(2L)).thenReturn(Optional.of(recipientWallet));
 
-        APIException exception = assertThrows(APIException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Insufficient balance", exception.getMessage());
     }
 
@@ -270,7 +270,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class,
+        DomainException exception = assertThrows(DomainException.class,
                 () -> walletService.validateWalletOwnership(walletId, userId));
         assertTrue(exception.getMessage().contains("Wallet not found"));
     }
@@ -290,7 +290,7 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
 
-        APIException exception = assertThrows(APIException.class,
+        DomainException exception = assertThrows(DomainException.class,
                 () -> walletService.validateWalletOwnership(walletId, userId));
         assertTrue(exception.getMessage().contains("Wallet does not belong to user"));
     }

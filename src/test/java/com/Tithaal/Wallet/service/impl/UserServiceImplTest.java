@@ -4,7 +4,7 @@ import com.Tithaal.Wallet.dto.*;
 import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.UserStatus;
 import com.Tithaal.Wallet.entity.Wallet;
-import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
@@ -77,7 +77,7 @@ class UserServiceImplTest {
 
         when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
-        APIException exception = assertThrows(APIException.class, () -> userService.registerUser(registerDto));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.registerUser(registerDto));
         assertEquals("Username is already taken!", exception.getMessage());
     }
 
@@ -91,29 +91,29 @@ class UserServiceImplTest {
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
-        APIException exception = assertThrows(APIException.class, () -> userService.registerUser(registerDto));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.registerUser(registerDto));
         assertEquals("Email is already taken!", exception.getMessage());
     }
 
     @Test
     void registerUser_Fail_NullOrEmptyFields() {
         RegisterDto registerDto1 = new RegisterDto(); // Null fields
-        assertThrows(APIException.class, () -> userService.registerUser(registerDto1));
+        assertThrows(DomainException.class, () -> userService.registerUser(registerDto1));
 
         RegisterDto registerDto2 = new RegisterDto();
         registerDto2.setUsername("");
-        assertThrows(APIException.class, () -> userService.registerUser(registerDto2));
+        assertThrows(DomainException.class, () -> userService.registerUser(registerDto2));
 
         RegisterDto registerDto3 = new RegisterDto();
         registerDto3.setUsername("user");
         registerDto3.setEmail("");
-        assertThrows(APIException.class, () -> userService.registerUser(registerDto3));
+        assertThrows(DomainException.class, () -> userService.registerUser(registerDto3));
 
         RegisterDto registerDto4 = new RegisterDto();
         registerDto4.setUsername("user");
         registerDto4.setEmail("email@test.com");
         registerDto4.setPassword("");
-        assertThrows(APIException.class, () -> userService.registerUser(registerDto4));
+        assertThrows(DomainException.class, () -> userService.registerUser(registerDto4));
     }
 
     // --- addWallet Tests ---
@@ -138,7 +138,7 @@ class UserServiceImplTest {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> userService.addWallet(userId));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.addWallet(userId));
         assertTrue(exception.getMessage().contains("User not found"));
     }
 
@@ -170,7 +170,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByUsernameOrEmail("unknown", "unknown")).thenReturn(Optional.empty());
 
-        APIException exception = assertThrows(APIException.class, () -> userService.loginUser(loginDto));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.loginUser(loginDto));
         assertTrue(exception.getMessage().contains("User not found"));
     }
 
@@ -187,19 +187,19 @@ class UserServiceImplTest {
         when(userRepository.findByUsernameOrEmail("testuser", "testuser")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrongpassword", "encodedPassword")).thenReturn(false);
 
-        APIException exception = assertThrows(APIException.class, () -> userService.loginUser(loginDto));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.loginUser(loginDto));
         assertEquals("Invalid password!", exception.getMessage());
     }
 
     @Test
     void loginUser_Fail_NullOrEmpty() {
         LoginDto loginDto1 = new LoginDto();
-        assertThrows(APIException.class, () -> userService.loginUser(loginDto1));
+        assertThrows(DomainException.class, () -> userService.loginUser(loginDto1));
 
         LoginDto loginDto2 = new LoginDto();
         loginDto2.setUsernameOrEmail("user");
         loginDto2.setPassword("");
-        assertThrows(APIException.class, () -> userService.loginUser(loginDto2));
+        assertThrows(DomainException.class, () -> userService.loginUser(loginDto2));
     }
 
     // --- getAllUsers Tests ---
@@ -249,7 +249,7 @@ class UserServiceImplTest {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(APIException.class, () -> userService.getUserDetails(userId));
+        assertThrows(DomainException.class, () -> userService.getUserDetails(userId));
     }
 
     // --- updateUser Tests ---
@@ -318,7 +318,8 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail("taken@example.com")).thenReturn(true);
 
-        APIException exception = assertThrows(APIException.class, () -> userService.updateUser(userId, updateDto));
+        DomainException exception = assertThrows(DomainException.class,
+                () -> userService.updateUser(userId, updateDto));
         assertEquals("Email is already taken!", exception.getMessage());
     }
 
@@ -356,7 +357,7 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(walletRepository.findByUser(user)).thenReturn(Collections.singletonList(wallet));
 
-        APIException exception = assertThrows(APIException.class, () -> userService.deleteUser(userId));
+        DomainException exception = assertThrows(DomainException.class, () -> userService.deleteUser(userId));
         assertTrue(exception.getMessage().contains("has active balance"));
 
         verify(userRepository, never()).delete(any(User.class));
@@ -367,6 +368,6 @@ class UserServiceImplTest {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(APIException.class, () -> userService.deleteUser(userId));
+        assertThrows(DomainException.class, () -> userService.deleteUser(userId));
     }
 }

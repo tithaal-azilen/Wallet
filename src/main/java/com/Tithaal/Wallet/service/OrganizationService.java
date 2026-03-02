@@ -3,8 +3,7 @@ package com.Tithaal.Wallet.service;
 import com.Tithaal.Wallet.dto.OrganizationDto;
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.Tithaal.Wallet.dto.PagedResponse;
 
 public interface OrganizationService {
     String registerOrganizationAndAdmin(OrganizationRegistrationDto registrationDto);
@@ -13,5 +12,6 @@ public interface OrganizationService {
 
     void deleteOrganization(Long orgId, Long adminId);
 
-    Page<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId, Pageable pageable);
+    PagedResponse<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId, int page, int size,
+            String sortBy, String sortDir);
 }

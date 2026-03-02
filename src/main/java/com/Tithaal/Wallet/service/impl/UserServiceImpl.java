@@ -10,7 +10,8 @@ import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.service.UserService;
-import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.exception.DomainException;
+import com.Tithaal.Wallet.exception.ErrorType;
 import com.Tithaal.Wallet.event.WalletCreatedEvent;
 import com.Tithaal.Wallet.entity.Organization;
 import com.Tithaal.Wallet.entity.Role;
@@ -21,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.HttpStatus;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -40,19 +39,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String registerUser(RegisterDto registerDto) {
         if (registerDto.getUsername() == null || registerDto.getUsername().trim().isEmpty()) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username cannot be null or empty!");
+            throw new DomainException(ErrorType.INVALID_INPUT, "Username cannot be null or empty!");
         }
         if (registerDto.getEmail() == null || registerDto.getEmail().trim().isEmpty()) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty!");
+            throw new DomainException(ErrorType.INVALID_INPUT, "Email cannot be null or empty!");
         }
         if (registerDto.getPassword() == null || registerDto.getPassword().trim().isEmpty()) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty!");
+            throw new DomainException(ErrorType.INVALID_INPUT, "Password cannot be null or empty!");
         }
         if (userRepository.existsByUsername(registerDto.getUsername())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Username is already taken!");
         }
         if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Email is already taken!");
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Email is already taken!");
         }
 
         User user = User.builder()
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
         if (registerDto.getOrgCode() != null && !registerDto.getOrgCode().trim().isEmpty()) {
             Organization organization = organizationRepository.findByOrgCode(registerDto.getOrgCode())
-                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Invalid organization code!"));
+                    .orElseThrow(() -> new DomainException(ErrorType.INVALID_INPUT, "Invalid organization code!"));
             user.setOrganization(organization);
         }
 
@@ -82,7 +81,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addWallet(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "User not found with id: " + userId));
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "User not found with id: " + userId));
 
         Wallet wallet = Wallet.builder()
                 .user(user)
@@ -104,22 +103,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public String loginUser(LoginDto loginDto) {
         if (loginDto.getUsernameOrEmail() == null || loginDto.getUsernameOrEmail().trim().isEmpty()) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username or Email cannot be null or empty!");
+            throw new DomainException(ErrorType.INVALID_INPUT, "Username or Email cannot be null or empty!");
         }
         if (loginDto.getPassword() == null || loginDto.getPassword().trim().isEmpty()) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty!");
+            throw new DomainException(ErrorType.INVALID_INPUT, "Password cannot be null or empty!");
         }
 
         User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "User not found with username or email: " + loginDto.getUsernameOrEmail()));
 
         if (user.getStatus() == UserStatus.INACTIVE) {
-            throw new APIException(HttpStatus.FORBIDDEN, "Account is disabled. Please contact support.");
+            throw new DomainException(ErrorType.FORBIDDEN, "Account is disabled. Please contact support.");
         }
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Invalid password!");
+            throw new DomainException(ErrorType.UNAUTHORIZED, "Invalid password!");
         }
 
         return "User Logged In Successfully!";
@@ -140,7 +139,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetailDto getUserDetails(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "User not found with id: " + userId));
 
         java.util.List<Wallet> wallets = walletRepository.findByUser(user);
@@ -165,7 +164,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(Long userId, UpdateUserDto updateDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "User not found with id: " + userId));
 
         if (updateDto.getCity() != null) {
@@ -179,13 +178,13 @@ public class UserServiceImpl implements UserService {
         }
         if (updateDto.getEmail() != null && !updateDto.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(updateDto.getEmail())) {
-                throw new APIException(HttpStatus.BAD_REQUEST, "Email is already taken!");
+                throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Email is already taken!");
             }
             user.setEmail(updateDto.getEmail());
         }
         if (updateDto.getUsername() != null && !updateDto.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(updateDto.getUsername())) {
-                throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
+                throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Username is already taken!");
             }
             user.setUsername(updateDto.getUsername());
         }
@@ -197,13 +196,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "User not found with id: " + userId));
 
         java.util.List<Wallet> wallets = walletRepository.findByUser(user);
         for (Wallet wallet : wallets) {
             if (wallet.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-                throw new APIException(HttpStatus.BAD_REQUEST,
+                throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
                         "Cannot delete user. Wallet with id " + wallet.getId() + " has active balance.");
             }
         }

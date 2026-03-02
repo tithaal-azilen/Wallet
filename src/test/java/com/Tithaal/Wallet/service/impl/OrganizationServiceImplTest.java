@@ -3,7 +3,7 @@ package com.Tithaal.Wallet.service.impl;
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.entity.*;
-import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import com.Tithaal.Wallet.dto.PagedResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -110,8 +111,9 @@ public class OrganizationServiceImplTest {
         when(walletTransactionRepository.findByOrganizationId(eq(testOrg.getId()), any(Pageable.class)))
                 .thenReturn(page);
 
-        Page<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(testOrg.getId(),
-                testAdmin.getId(), Pageable.unpaged());
+        PagedResponse<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(
+                testOrg.getId(),
+                testAdmin.getId(), 0, 10, "createdAt", "DESC");
 
         assertEquals(1, result.getTotalElements());
         assertEquals(BigDecimal.TEN, result.getContent().get(0).getAmount());
@@ -126,8 +128,8 @@ public class OrganizationServiceImplTest {
 
         when(userRepository.findById(wrongAdmin.getId())).thenReturn(Optional.of(wrongAdmin));
 
-        assertThrows(APIException.class, () -> organizationService.getOrganizationTransactions(testOrg.getId(),
-                wrongAdmin.getId(), Pageable.unpaged()));
+        assertThrows(DomainException.class, () -> organizationService.getOrganizationTransactions(testOrg.getId(),
+                wrongAdmin.getId(), 0, 10, "createdAt", "DESC"));
     }
 
     @Test

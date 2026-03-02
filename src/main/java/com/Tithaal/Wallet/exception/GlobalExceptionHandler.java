@@ -21,12 +21,32 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Handle specific exceptions
-    @ExceptionHandler(APIException.class)
-    public ResponseEntity<ErrorDetails> handleAPIException(APIException exception,
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<ErrorDetails> handleDomainException(DomainException exception,
             WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
                 webRequest.getDescription(false));
-        return new ResponseEntity<>(errorDetails, exception.getStatus());
+
+        HttpStatus status;
+        switch (exception.getErrorType()) {
+            case NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case INVALID_INPUT:
+            case BUSINESS_RULE_VIOLATION:
+                status = HttpStatus.BAD_REQUEST;
+                break;
+            case UNAUTHORIZED:
+                status = HttpStatus.UNAUTHORIZED;
+                break;
+            case FORBIDDEN:
+                status = HttpStatus.FORBIDDEN;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(errorDetails, status);
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)

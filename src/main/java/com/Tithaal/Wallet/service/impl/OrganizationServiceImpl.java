@@ -4,7 +4,9 @@ import com.Tithaal.Wallet.dto.OrganizationDto;
 import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.entity.*;
-import com.Tithaal.Wallet.exception.APIException;
+import com.Tithaal.Wallet.exception.DomainException;
+import com.Tithaal.Wallet.exception.ErrorType;
+import com.Tithaal.Wallet.dto.PagedResponse;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
 import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
@@ -12,8 +14,9 @@ import com.Tithaal.Wallet.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +38,13 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Transactional
     public String registerOrganizationAndAdmin(OrganizationRegistrationDto registrationDto) {
         if (organizationRepository.existsByName(registrationDto.getOrgName())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Organization name already exists!");
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Organization name already exists!");
         }
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username is already taken!");
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Username is already taken!");
         }
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Email is already taken!");
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Email is already taken!");
         }
 
         String orgCode = registrationDto.getOrgName().substring(0, 3).toUpperCase()
@@ -76,7 +79,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationDto getOrganization(Long orgId) {
         Organization organization = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Organization not found"));
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Organization not found"));
         return mapToDto(organization);
     }
 
@@ -85,38 +88,54 @@ public class OrganizationServiceImpl implements OrganizationService {
     public void deleteOrganization(Long orgId, Long adminId) {
         validateAdminOwnership(orgId, adminId);
         Organization organization = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Organization not found"));
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Organization not found"));
         organization.setStatus(OrganizationStatus.DELETED);
         organizationRepository.save(organization);
     }
 
     @Override
-    public Page<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId,
-            Pageable pageable) {
+    public PagedResponse<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId,
+            int page, int size, String sortBy, String sortDir) {
         validateAdminOwnership(orgId, adminId);
+
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<WalletTransaction> transactions = walletTransactionRepository.findByOrganizationId(orgId, pageable);
 
-        return transactions.map(t -> OrganizationTransactionDto.builder()
-                .id(t.getId())
-                .description(t.getDescription())
-                .amount(t.getAmount())
-                .type(t.getType())
-                .balanceAfter(t.getBalanceAfter())
-                .walletId(t.getWallet().getId())
-                .userId(t.getWallet().getUser().getId())
-                .username(t.getWallet().getUser().getUsername())
-                .createdAt(t.getCreatedAt())
-                .build());
+        java.util.List<OrganizationTransactionDto> content = transactions.getContent().stream()
+                .map(t -> OrganizationTransactionDto.builder()
+                        .id(t.getId())
+                        .description(t.getDescription())
+                        .amount(t.getAmount())
+                        .type(t.getType())
+                        .balanceAfter(t.getBalanceAfter())
+                        .walletId(t.getWallet().getId())
+                        .userId(t.getWallet().getUser().getId())
+                        .username(t.getWallet().getUser().getUsername())
+                        .createdAt(t.getCreatedAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+
+        return PagedResponse.<OrganizationTransactionDto>builder()
+                .content(content)
+                .pageNo(transactions.getNumber())
+                .pageSize(transactions.getSize())
+                .totalElements(transactions.getTotalElements())
+                .totalPages(transactions.getTotalPages())
+                .last(transactions.isLast())
+                .build();
     }
 
     private void validateAdminOwnership(Long orgId, Long adminId) {
         log.info("Validating admin ownership for orgId: " + orgId + " and adminId: " + adminId);
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new APIException(HttpStatus.UNAUTHORIZED, "Admin user not found"));
+                .orElseThrow(() -> new DomainException(ErrorType.UNAUTHORIZED, "Admin user not found"));
 
         if (admin.getOrganization() == null || !admin.getOrganization().getId().equals(orgId)) {
-            throw new APIException(HttpStatus.FORBIDDEN,
+            throw new DomainException(ErrorType.FORBIDDEN,
                     "You do not have permission to access this organization");
         }
     }

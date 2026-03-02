@@ -38,19 +38,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new RuntimeException("User not found with id: " + userId));
 
-        // Delete any existing refresh token for this user to enforce single-session
-        // Or we could allow multiple, but let's delete existing for simplicity and
-        // security.
-        refreshTokenRepository.deleteByUser(user);
-
         String rawToken = UUID.randomUUID().toString();
         String tokenHash = HashUtil.hashToken(rawToken);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .tokenHash(tokenHash)
-                .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
-                .build();
+        // Instead of deleting and inserting, which causes unique constraint violation
+        // because Hibernate executes inserts before deletes, we check if one exists and
+        // update it
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+                .orElseGet(() -> RefreshToken.builder().user(user).build());
+
+        refreshToken.setTokenHash(tokenHash);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
 
         refreshTokenRepository.save(refreshToken);
         return rawToken;
@@ -71,16 +69,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         User user = refreshToken.getUser();
 
-        // Rotate token
         String newRawToken = UUID.randomUUID().toString();
         String newTokenHash = HashUtil.hashToken(newRawToken);
 
-        // Update the existing token with new hash and extended expiry
         refreshToken.setTokenHash(newTokenHash);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshTokenRepository.save(refreshToken);
 
-        // Generate new Access Token
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
                 userDetails.getAuthorities());

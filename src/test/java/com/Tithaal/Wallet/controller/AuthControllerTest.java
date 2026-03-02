@@ -64,7 +64,7 @@ public class AuthControllerTest {
     @Test
     public void register_Fail_InvalidUsername() throws Exception {
         RegisterDto registerDto = new RegisterDto();
-        registerDto.setUsername("invalid user"); // invalid characters (space)
+        registerDto.setUsername("invalid user");
         registerDto.setEmail("valid@example.com");
         registerDto.setPassword("password123");
         registerDto.setCity("Test City");
