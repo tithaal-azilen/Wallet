@@ -53,13 +53,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()
-                && !authentication.getPrincipal().equals("anonymousUser")) {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "User not found"));
-            refreshTokenService.deleteByUserId(user.getId());
+    public void logout(String refreshToken) {
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            refreshTokenService.deleteByToken(refreshToken);
         }
     }
 }

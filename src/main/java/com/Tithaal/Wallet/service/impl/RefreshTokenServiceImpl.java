@@ -91,4 +91,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 () -> new RuntimeException("User not found with id: " + userId));
         refreshTokenRepository.deleteByUser(user);
     }
+
+    @Override
+    @Transactional
+    public void deleteByToken(String rawToken) {
+        String tokenHash = HashUtil.hashToken(rawToken);
+        refreshTokenRepository.deleteByTokenHash(tokenHash);
+    }
 }
