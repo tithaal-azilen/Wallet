@@ -113,7 +113,7 @@ public class OrganizationServiceImplTest {
 
         PagedResponse<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(
                 testOrg.getId(),
-                testAdmin.getId(), 0, 10, "createdAt", "DESC");
+                testAdmin.getId(), 0, 10, "createdAt", "DESC", null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(BigDecimal.TEN, result.getContent().get(0).getAmount());
@@ -129,7 +129,7 @@ public class OrganizationServiceImplTest {
         when(userRepository.findById(wrongAdmin.getId())).thenReturn(Optional.of(wrongAdmin));
 
         assertThrows(DomainException.class, () -> organizationService.getOrganizationTransactions(testOrg.getId(),
-                wrongAdmin.getId(), 0, 10, "createdAt", "DESC"));
+                wrongAdmin.getId(), 0, 10, "createdAt", "DESC", null));
     }
 
     @Test

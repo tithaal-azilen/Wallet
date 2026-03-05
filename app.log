@@ -1,2 +1,41 @@
-2026-03-02T16:41:51.973+05:30  INFO 297405 --- [Wallet] [scheduling-1] c.T.Wallet.service.FeeDeductionService   : Starting monthly fee deduction process for date: 2026-03-02
-2026-03-02T16:41:52.036+05:30  INFO 297405 --- [Wallet] [scheduling-1] c.T.Wallet.service.FeeDeductionService   : Completed monthly fee deduction process.
+2026-03-05T16:22:41.901+05:30  INFO 56129 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Starting WalletApplication using Java 17.0.18 with PID 56129 (/home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet/target/classes started by tithaal.sheth in /home/tithaal.sheth/Desktop/SpringProjects/wallet 2.0/Wallet)
+2026-03-05T16:22:41.912+05:30  INFO 56129 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-03-05T16:22:43.338+05:30  INFO 56129 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-05T16:22:43.452+05:30  INFO 56129 --- [Wallet] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 97 ms. Found 5 JPA repository interfaces.
+2026-03-05T16:22:44.672+05:30  INFO 56129 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-03-05T16:22:44.698+05:30  INFO 56129 --- [Wallet] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-05T16:22:44.699+05:30  INFO 56129 --- [Wallet] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-05T16:22:44.799+05:30  INFO 56129 --- [Wallet] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2803 ms
+2026-03-05T16:22:45.048+05:30  INFO 56129 --- [Wallet] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-05T16:22:45.149+05:30  INFO 56129 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-03-05T16:22:45.853+05:30  INFO 56129 --- [Wallet] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-05T16:22:45.906+05:30  INFO 56129 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-05T16:22:46.371+05:30  INFO 56129 --- [Wallet] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@128a188a
+2026-03-05T16:22:46.373+05:30  INFO 56129 --- [Wallet] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-05T16:22:46.431+05:30  WARN 56129 --- [Wallet] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-05T16:22:46.468+05:30  INFO 56129 --- [Wallet] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/springboot_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.13
+	Default catalog/schema: springboot_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-05T16:22:48.116+05:30  INFO 56129 --- [Wallet] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-05T16:22:48.315+05:30  INFO 56129 --- [Wallet] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-05T16:22:48.525+05:30  INFO 56129 --- [Wallet] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-05T16:22:49.803+05:30  INFO 56129 --- [Wallet] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-03-05T16:22:50.429+05:30  WARN 56129 --- [Wallet] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-05T16:22:51.629+05:30  INFO 56129 --- [Wallet] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-03-05T16:22:51.649+05:30  INFO 56129 --- [Wallet] [main] com.Tithaal.Wallet.WalletApplication     : Started WalletApplication in 10.6 seconds (process running for 11.328)
+2026-03-05T16:22:51.653+05:30  WARN 56129 --- [Wallet] [main] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-03-05T16:22:51.654+05:30  WARN 56129 --- [Wallet] [main] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-03-05T16:23:21.547+05:30  INFO 56129 --- [Wallet] [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-05T16:23:21.548+05:30  INFO 56129 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-03-05T16:23:21.552+05:30  INFO 56129 --- [Wallet] [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-03-05T16:23:23.484+05:30  INFO 56129 --- [Wallet] [http-nio-8081-exec-8] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 976 ms
+2026-03-05T16:23:48.311+05:30  INFO 56129 --- [Wallet] [http-nio-8081-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 336 ms

@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
 
     Boolean existsByEmail(String email);
+
+    org.springframework.data.domain.Page<User> findByOrganizationId(Long organizationId,
+            org.springframework.data.domain.Pageable pageable);
 }
