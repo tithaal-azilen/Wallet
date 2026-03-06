@@ -1,6 +1,6 @@
 package com.Tithaal.Wallet.dto;
 
-import com.Tithaal.Wallet.entity.TransactionType;
+import com.Tithaal.Wallet.entity.OrganizationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,16 +13,14 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionFilterDto {
-    private TransactionType transactionType;
+public class OrganizationFilterDto {
+    private String name;
+    private String orgCode;
+    private OrganizationStatus status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant startDate;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant endDate;
-
-    private Long userId;
-    private Long walletId;
-    private Long organizationId;
 }

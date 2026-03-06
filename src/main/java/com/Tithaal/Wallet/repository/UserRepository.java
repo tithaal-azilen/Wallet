@@ -20,4 +20,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     org.springframework.data.domain.Page<User> findByOrganizationId(Long organizationId,
             org.springframework.data.domain.Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query("SELECT u FROM User u " +
+            "LEFT JOIN u.organization o WHERE " +
+            "(:username IS NULL OR u.username ILIKE %:username%) AND " +
+            "(:email IS NULL OR u.email ILIKE %:email%) AND " +
+            "(:role IS NULL OR u.role = :role) AND " +
+            "(:status IS NULL OR u.status = :status) AND " +
+            "(:organizationId IS NULL OR o.id = :organizationId)")
+    org.springframework.data.domain.Page<User> findAllWithFilters(
+            @org.springframework.data.repository.query.Param("username") String username,
+            @org.springframework.data.repository.query.Param("email") String email,
+            @org.springframework.data.repository.query.Param("role") com.Tithaal.Wallet.entity.Role role,
+            @org.springframework.data.repository.query.Param("status") com.Tithaal.Wallet.entity.UserStatus status,
+            @org.springframework.data.repository.query.Param("organizationId") Long organizationId,
+            org.springframework.data.domain.Pageable pageable);
 }

@@ -46,4 +46,12 @@ public class SwaggerConfig {
                                 .pathsToExclude("/api/auth/register/**")
                                 .build();
         }
+
+        @Bean
+        public GroupedOpenApi platformApi() {
+                return GroupedOpenApi.builder()
+                                .group("super_admin")
+                                .pathsToMatch("/api/platform/**", "/api/auth/login")
+                                .build();
+        }
 }

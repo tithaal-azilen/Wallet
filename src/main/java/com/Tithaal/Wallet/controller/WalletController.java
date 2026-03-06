@@ -20,7 +20,7 @@ public class WalletController {
         private final WalletService walletService;
 
         @PostMapping("/{walletId}/payment")
-        @PreAuthorize("#userId == principal.id")
+        @PreAuthorize("#userId == principal.id && hasRole('USER')")
         public ResponseEntity<ApiResponse<String>> processPayment(@PathVariable Long userId,
                         @PathVariable Long walletId,
                         @Valid @RequestBody CreditRequestDto creditRequestDto) {
@@ -29,7 +29,7 @@ public class WalletController {
         }
 
         @PostMapping("/transfer")
-        @PreAuthorize("#userId == principal.id")
+        @PreAuthorize("#userId == principal.id && hasRole('USER')")
         public ResponseEntity<ApiResponse<String>> transferMoney(@PathVariable Long userId,
                         @Valid @RequestBody DebitRequestDto debitRequestDto) {
                 String result = walletService.Transfer(debitRequestDto, userId);

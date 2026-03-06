@@ -13,4 +13,18 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     boolean existsByOrgCode(String orgCode);
 
     boolean existsByName(String name);
+
+    @org.springframework.data.jpa.repository.Query("SELECT o FROM Organization o WHERE " +
+            "(:name IS NULL OR o.name ILIKE %:name%) AND " +
+            "(:orgCode IS NULL OR o.orgCode = :orgCode) AND " +
+            "(:status IS NULL OR o.status = :status) AND " +
+            "(cast(:startDate as timestamp) IS NULL OR o.createdAt >= :startDate) AND " +
+            "(cast(:endDate as timestamp) IS NULL OR o.createdAt <= :endDate)")
+    org.springframework.data.domain.Page<Organization> findAllWithFilters(
+            @org.springframework.data.repository.query.Param("name") String name,
+            @org.springframework.data.repository.query.Param("orgCode") String orgCode,
+            @org.springframework.data.repository.query.Param("status") com.Tithaal.Wallet.entity.OrganizationStatus status,
+            @org.springframework.data.repository.query.Param("startDate") java.time.Instant startDate,
+            @org.springframework.data.repository.query.Param("endDate") java.time.Instant endDate,
+            org.springframework.data.domain.Pageable pageable);
 }

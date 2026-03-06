@@ -54,7 +54,7 @@ public class UserController {
 
     @Operation(summary = "Add Wallet to User", description = "Create a new wallet for a specific user")
     @PostMapping("/{id}/addwallet")
-    @PreAuthorize("#id == principal.id")
+    @PreAuthorize("#id == principal.id && hasRole('USER')")
     public ResponseEntity<String> addWallet(@PathVariable Long id) {
         String result = userService.addWallet(id);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
