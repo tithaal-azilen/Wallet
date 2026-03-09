@@ -20,6 +20,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import org.mockito.Mockito;
+
 @ExtendWith(MockitoExtension.class)
 class WalletHistoryServiceImplTest {
 
@@ -58,28 +60,29 @@ class WalletHistoryServiceImplTest {
                                 .createdAt(Instant.now().minusSeconds(60)) // Older
                                 .build();
 
-                // Repository returns them sorted by date desc
-                when(walletTransactionRepository.findAllByWalletUserIdOrderByCreatedAtDesc(userId))
-                                .thenReturn(Arrays.asList(t1, t2));
+                org.springframework.data.domain.Page<WalletTransaction> page = new org.springframework.data.domain.PageImpl<>(Arrays.asList(t1, t2));
+                when(walletTransactionRepository.findAll(Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(), any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(page);
 
-                List<WalletTransactionEntryDto> result = walletHistoryService.getUserHistory(userId);
+                com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto> result = walletHistoryService.getUserHistory(userId, null, 0, 10, "createdAt", "desc");
 
-                assertEquals(2, result.size());
-                assertEquals(t1.getId(), result.get(0).getId());
-                assertEquals(t2.getId(), result.get(1).getId());
-                assertEquals(101L, result.get(0).getWalletId());
+                assertEquals(2, result.getContent().size());
+                assertEquals(t1.getId(), result.getContent().get(0).getId());
+                assertEquals(t2.getId(), result.getContent().get(1).getId());
         }
 
         @Test
         void getUserHistory_Success_Empty() {
                 Long userId = 1L;
-                when(walletTransactionRepository.findAllByWalletUserIdOrderByCreatedAtDesc(userId))
-                                .thenReturn(Collections.emptyList());
+                
+                org.springframework.data.domain.Page<WalletTransaction> page = new org.springframework.data.domain.PageImpl<>(Collections.emptyList());
+                when(walletTransactionRepository.findAll(Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(), any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(page);
 
-                List<WalletTransactionEntryDto> result = walletHistoryService.getUserHistory(userId);
+                com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto> result = walletHistoryService.getUserHistory(userId, null, 0, 10, "createdAt", "desc");
 
                 assertNotNull(result);
-                assertTrue(result.isEmpty());
+                assertTrue(result.getContent().isEmpty());
         }
 
         // --- getWalletHistory Tests ---

@@ -87,8 +87,13 @@ public class WalletServiceImpl implements WalletService {
         senderWallet.debit(debitRequestDto.getAmount());
         Wallet savedSenderWallet = walletRepository.save(senderWallet);
 
+        // Credit recipient
+        recipientWallet.credit(debitRequestDto.getAmount());
+        Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
+
         WalletTransaction senderTransaction = WalletTransaction.builder()
                 .wallet(savedSenderWallet)
+                .recipientWallet(savedRecipientWallet)
                 .type(TransactionType.DEBIT)
                 .amount(debitRequestDto.getAmount())
                 .description("Transfer to wallet id: " + debitRequestDto.getReceivingWalletId())
@@ -96,10 +101,6 @@ public class WalletServiceImpl implements WalletService {
                 .createdAt(Instant.now())
                 .build();
         walletTransactionRepository.save(senderTransaction);
-
-        // Credit recipient
-        recipientWallet.credit(debitRequestDto.getAmount());
-        Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
 
         WalletTransaction recipientTransaction = WalletTransaction.builder()
                 .wallet(savedRecipientWallet)

@@ -17,4 +17,5 @@ public class UserFilterDto {
     private Role role;
     private UserStatus status;
     private Long organizationId;
+    private String phoneNumber;
 }

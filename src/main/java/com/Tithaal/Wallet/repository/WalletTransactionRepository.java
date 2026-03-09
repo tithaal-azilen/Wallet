@@ -3,10 +3,11 @@ package com.Tithaal.Wallet.repository;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
+public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long>, JpaSpecificationExecutor<WalletTransaction> {
         void deleteAllByWallet(Wallet wallet);
 
         java.util.List<WalletTransaction> findByWalletIdOrderByCreatedAtDesc(Long walletId);

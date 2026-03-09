@@ -25,6 +25,10 @@ public class WalletTransaction {
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_wallet_id")
+    private Wallet recipientWallet;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionType type; // CREDIT / DEBIT

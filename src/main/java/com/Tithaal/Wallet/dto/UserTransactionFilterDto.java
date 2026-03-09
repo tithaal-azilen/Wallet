@@ -9,25 +9,26 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionFilterDto {
-    private TransactionType transactionType;
-
+public class UserTransactionFilterDto {
+    
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant startDate;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant endDate;
 
-    private Long userId;
-    private Long walletId;
-    private Long organizationId;
+    private TransactionType type;
     
     private BigDecimal minAmount;
     private BigDecimal maxAmount;
+    
     private String referenceId;
+    private Long walletId;
     private String descriptionKeyword;
+    private Long recipientId;
 }

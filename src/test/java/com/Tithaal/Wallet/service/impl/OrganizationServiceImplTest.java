@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import org.mockito.Mockito;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,7 +109,9 @@ public class OrganizationServiceImplTest {
         Page<WalletTransaction> page = new PageImpl<>(List.of(transaction));
 
         when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
-        when(walletTransactionRepository.findByOrganizationId(eq(testOrg.getId()), any(Pageable.class)))
+        when(walletTransactionRepository.findAll(
+                Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(),
+                any(Pageable.class)))
                 .thenReturn(page);
 
         PagedResponse<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(

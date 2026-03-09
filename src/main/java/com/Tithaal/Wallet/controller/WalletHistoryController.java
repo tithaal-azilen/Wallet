@@ -28,8 +28,14 @@ public class WalletHistoryController {
     @Operation(summary = "Get User Transaction History", description = "Retrieve transaction history for a specific user")
     @GetMapping("/{userid}")
     @PreAuthorize("#userid == principal.id")
-    public ResponseEntity<List<WalletTransactionEntryDto>> getUserHistory(@PathVariable Long userid) {
-        List<WalletTransactionEntryDto> ledger = walletHistoryService.getUserHistory(userid);
+    public ResponseEntity<com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto>> getUserHistory(
+            @PathVariable Long userid,
+            @org.springframework.web.bind.annotation.ModelAttribute com.Tithaal.Wallet.dto.UserTransactionFilterDto filterDto,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "createdAt") String sortBy,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "desc") String sortDir) {
+        com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto> ledger = walletHistoryService.getUserHistory(userid, filterDto, page, size, sortBy, sortDir);
         return ResponseEntity.ok(ledger);
     }
 

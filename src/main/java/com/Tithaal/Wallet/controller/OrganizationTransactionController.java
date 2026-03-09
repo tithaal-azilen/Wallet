@@ -30,7 +30,7 @@ public class OrganizationTransactionController {
             @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
             @RequestParam(defaultValue = "DESC", required = false) String sortDir,
-            @ModelAttribute com.Tithaal.Wallet.dto.TransactionFilterDto filterDto) {
+            @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long adminId = userDetails.getId();
         PagedResponse<OrganizationTransactionDto> transactions = organizationService.getOrganizationTransactions(orgId,

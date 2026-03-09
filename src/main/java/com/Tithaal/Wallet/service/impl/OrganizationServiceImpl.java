@@ -103,7 +103,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         @Override
         public PagedResponse<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId,
                         int page, int size, String sortBy, String sortDir,
-                        com.Tithaal.Wallet.dto.TransactionFilterDto filterDto) {
+                        com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
                 validateAdminOwnership(orgId, adminId);
 
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
@@ -111,19 +111,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                 Pageable pageable = PageRequest.of(page, size, sort);
 
-                Page<WalletTransaction> transactions;
-
-                if (filterDto != null) {
-                        transactions = walletTransactionRepository.findByOrganizationIdWithFilters(
-                                        orgId,
-                                        filterDto.getTransactionType(),
-                                        filterDto.getStartDate(),
-                                        filterDto.getEndDate(),
-                                        filterDto.getUserId(),
-                                        pageable);
-                } else {
-                        transactions = walletTransactionRepository.findByOrganizationId(orgId, pageable);
-                }
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getAdminTransactions(orgId, filterDto);
+                Page<WalletTransaction> transactions = walletTransactionRepository.findAll(spec, pageable);
 
                 java.util.List<OrganizationTransactionDto> content = transactions.getContent().stream()
                                 .map(t -> OrganizationTransactionDto.builder()

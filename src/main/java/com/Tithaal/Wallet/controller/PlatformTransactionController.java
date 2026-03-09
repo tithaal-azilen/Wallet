@@ -2,7 +2,6 @@ package com.Tithaal.Wallet.controller;
 
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.dto.PagedResponse;
-import com.Tithaal.Wallet.dto.TransactionFilterDto;
 import com.Tithaal.Wallet.service.PlatformTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +26,7 @@ public class PlatformTransactionController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping
     public ResponseEntity<PagedResponse<OrganizationTransactionDto>> getAllTransactions(
-            @ModelAttribute TransactionFilterDto filter,
+            @ModelAttribute com.Tithaal.Wallet.dto.SuperAdminTransactionFilterDto filter,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "createdAt", required = false) String sortBy,

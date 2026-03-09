@@ -2,7 +2,6 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.dto.PagedResponse;
-import com.Tithaal.Wallet.dto.TransactionFilterDto;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.PlatformTransactionService;
@@ -23,15 +22,15 @@ public class PlatformTransactionServiceImpl implements PlatformTransactionServic
         private final WalletTransactionRepository walletTransactionRepository;
 
         @Override
-        public PagedResponse<OrganizationTransactionDto> getAllTransactions(TransactionFilterDto filter, int page,
+        public PagedResponse<OrganizationTransactionDto> getAllTransactions(com.Tithaal.Wallet.dto.SuperAdminTransactionFilterDto filter, int page,
                         int size, String sortBy,
                         String sortDir) {
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                                 : Sort.by(sortBy).descending();
                 Pageable pageable = PageRequest.of(page, size, sort);
-                Page<WalletTransaction> transactionsPage = walletTransactionRepository.findAllPlatformWithFilters(
-                                filter.getTransactionType(), filter.getStartDate(), filter.getEndDate(),
-                                filter.getUserId(), filter.getWalletId(), filter.getOrganizationId(), pageable);
+                
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getSuperAdminTransactions(filter);
+                Page<WalletTransaction> transactionsPage = walletTransactionRepository.findAll(spec, pageable);
 
                 List<OrganizationTransactionDto> content = transactionsPage.getContent().stream()
                                 .map(this::mapToDto)
