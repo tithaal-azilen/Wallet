@@ -42,6 +42,7 @@ public class WalletServiceImpl implements WalletService {
 
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(savedWallet)
+                .recipientWallet(null) // A top-up doesn't have a distinct recipient wallet, so it's null
                 .type(TransactionType.CREDIT)
                 .amount(creditRequestDto.getAmount())
                 .description("Wallet credited using credit card number: " + creditRequestDto.getCreditCardNumber())
@@ -104,6 +105,7 @@ public class WalletServiceImpl implements WalletService {
 
         WalletTransaction recipientTransaction = WalletTransaction.builder()
                 .wallet(savedRecipientWallet)
+                .recipientWallet(savedSenderWallet)
                 .type(TransactionType.CREDIT)
                 .amount(debitRequestDto.getAmount())
                 .description("Transfer from wallet id: " + debitRequestDto.getSendingWalletId())

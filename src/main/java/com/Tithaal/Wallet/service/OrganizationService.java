@@ -15,6 +15,7 @@ public interface OrganizationService {
         PagedResponse<OrganizationTransactionDto> getOrganizationTransactions(Long orgId, Long adminId, int page,
                         int size,
                         String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto);
+        java.util.List<OrganizationTransactionDto> getAllOrganizationTransactions(Long orgId, Long adminId, String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto);
 
         OrganizationDto getOrganizationDetails(Long orgId, Long adminId);
 

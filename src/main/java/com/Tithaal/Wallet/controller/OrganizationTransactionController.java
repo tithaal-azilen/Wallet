@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrganizationTransactionController {
 
     private final OrganizationService organizationService;
+    private final com.Tithaal.Wallet.service.PdfReportService pdfReportService;
 
     @Operation(summary = "Get paginated transactions for an organization (Admin only)")
     @PreAuthorize("hasRole('ORG_ADMIN')")
@@ -36,5 +37,26 @@ public class OrganizationTransactionController {
         PagedResponse<OrganizationTransactionDto> transactions = organizationService.getOrganizationTransactions(orgId,
                 adminId, page, size, sortBy, sortDir, filterDto);
         return ResponseEntity.ok(transactions);
+    }
+
+    @Operation(summary = "Download organization transactions as PDF (Admin only)")
+    @PreAuthorize("hasRole('ORG_ADMIN')")
+    @GetMapping("/{orgId}/download")
+    public ResponseEntity<byte[]> downloadTransactions(
+            @PathVariable Long orgId,
+            Authentication authentication,
+            @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
+            @RequestParam(defaultValue = "DESC", required = false) String sortDir,
+            @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminId = userDetails.getId();
+        java.util.List<com.Tithaal.Wallet.dto.OrganizationTransactionDto> transactions = organizationService.getAllOrganizationTransactions(orgId, adminId, sortBy, sortDir, filterDto);
+        byte[] pdfBytes = pdfReportService.generateOrgTransactionReport(transactions);
+
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment().filename("org_transaction_report.pdf").build());
+
+        return new ResponseEntity<>(pdfBytes, headers, org.springframework.http.HttpStatus.OK);
     }
 }

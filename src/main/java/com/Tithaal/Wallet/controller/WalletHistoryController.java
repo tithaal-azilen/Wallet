@@ -3,6 +3,10 @@ package com.Tithaal.Wallet.controller;
 import com.Tithaal.Wallet.dto.WalletTransactionEntryDto;
 import com.Tithaal.Wallet.service.WalletHistoryService;
 import com.Tithaal.Wallet.service.WalletService;
+import com.Tithaal.Wallet.dto.PagedResponse;
+import com.Tithaal.Wallet.dto.UserTransactionFilterDto;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,18 +28,19 @@ public class WalletHistoryController {
 
     private final WalletHistoryService walletHistoryService;
     private final WalletService walletService;
+    private final com.Tithaal.Wallet.service.PdfReportService pdfReportService;
 
     @Operation(summary = "Get User Transaction History", description = "Retrieve transaction history for a specific user")
     @GetMapping("/{userid}")
     @PreAuthorize("#userid == principal.id")
-    public ResponseEntity<com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto>> getUserHistory(
+    public ResponseEntity<PagedResponse<WalletTransactionEntryDto>> getUserHistory(
             @PathVariable Long userid,
-            @org.springframework.web.bind.annotation.ModelAttribute com.Tithaal.Wallet.dto.UserTransactionFilterDto filterDto,
-            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
-            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
-            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "createdAt") String sortBy,
-            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "desc") String sortDir) {
-        com.Tithaal.Wallet.dto.PagedResponse<WalletTransactionEntryDto> ledger = walletHistoryService.getUserHistory(userid, filterDto, page, size, sortBy, sortDir);
+            @ModelAttribute UserTransactionFilterDto filterDto,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        PagedResponse<WalletTransactionEntryDto> ledger = walletHistoryService.getUserHistory(userid, filterDto, page, size, sortBy, sortDir);
         return ResponseEntity.ok(ledger);
     }
 
@@ -47,5 +52,23 @@ public class WalletHistoryController {
         walletService.validateWalletOwnership(walletid, userid);
         List<WalletTransactionEntryDto> ledger = walletHistoryService.getWalletHistory(walletid);
         return ResponseEntity.ok(ledger);
+    }
+
+    @Operation(summary = "Download User Transaction History as PDF", description = "Download transaction history for a specific user as a PDF file")
+    @GetMapping("/{userid}/download")
+    @PreAuthorize("#userid == principal.id")
+    public ResponseEntity<byte[]> downloadUserHistory(
+            @PathVariable Long userid,
+            @ModelAttribute UserTransactionFilterDto filterDto,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        List<WalletTransactionEntryDto> transactions = walletHistoryService.getAllUserHistory(userid, filterDto, sortBy, sortDir);
+        byte[] pdfBytes = pdfReportService.generateUserTransactionReport(transactions);
+
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment().filename("transaction_report.pdf").build());
+
+        return new ResponseEntity<>(pdfBytes, headers, org.springframework.http.HttpStatus.OK);
     }
 }

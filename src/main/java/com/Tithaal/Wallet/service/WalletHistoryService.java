@@ -9,4 +9,5 @@ public interface WalletHistoryService {
     PagedResponse<WalletTransactionEntryDto> getUserHistory(Long userId, UserTransactionFilterDto filterDto, int page, int size, String sortBy, String sortDir);
 
     List<WalletTransactionEntryDto> getWalletHistory(Long walletId);
+    List<WalletTransactionEntryDto> getAllUserHistory(Long userId, UserTransactionFilterDto filterDto, String sortBy, String sortDir);
 }

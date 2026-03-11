@@ -59,4 +59,17 @@ public class PlatformTransactionServiceImpl implements PlatformTransactionServic
                                 .createdAt(t.getCreatedAt())
                                 .build();
         }
+
+        @Override
+        public java.util.List<OrganizationTransactionDto> getAllPlatformTransactions(com.Tithaal.Wallet.dto.SuperAdminTransactionFilterDto filter, String sortBy, String sortDir) {
+                Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                                : Sort.by(sortBy).descending();
+                
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getSuperAdminTransactions(filter);
+                java.util.List<WalletTransaction> transactions = walletTransactionRepository.findAll(spec, sort);
+
+                return transactions.stream()
+                                .map(this::mapToDto)
+                                .collect(Collectors.toList());
+        }
 }

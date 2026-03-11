@@ -22,3 +22,10 @@ SET recipient_wallet_id = CAST(SUBSTRING(description FROM 'Transfer to wallet id
 WHERE description LIKE 'Transfer to wallet id: %'
   AND type = 'DEBIT'
   AND recipient_wallet_id IS NULL;
+
+-- The description format for received transfers is: "Transfer from wallet id: X"
+UPDATE wallet.wallet_transaction
+SET recipient_wallet_id = CAST(SUBSTRING(description FROM 'Transfer from wallet id: ([0-9]+)') AS BIGINT)
+WHERE description LIKE 'Transfer from wallet id: %'
+  AND type = 'CREDIT'
+  AND recipient_wallet_id IS NULL;

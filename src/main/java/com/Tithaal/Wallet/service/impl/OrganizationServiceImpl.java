@@ -139,6 +139,31 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         @Override
+        public java.util.List<OrganizationTransactionDto> getAllOrganizationTransactions(Long orgId, Long adminId, String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
+                validateAdminOwnership(orgId, adminId);
+
+                Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                                : Sort.by(sortBy).descending();
+
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getAdminTransactions(orgId, filterDto);
+                java.util.List<WalletTransaction> transactions = walletTransactionRepository.findAll(spec, sort);
+
+                return transactions.stream()
+                                .map(t -> OrganizationTransactionDto.builder()
+                                                .id(t.getId())
+                                                .description(t.getDescription())
+                                                .amount(t.getAmount())
+                                                .type(t.getType())
+                                                .balanceAfter(t.getBalanceAfter())
+                                                .walletId(t.getWallet().getId())
+                                                .userId(t.getWallet().getUser().getId())
+                                                .username(t.getWallet().getUser().getUsername())
+                                                .createdAt(t.getCreatedAt())
+                                                .build())
+                                .collect(java.util.stream.Collectors.toList());
+        }
+
+        @Override
         @Transactional
         public void updateOrganization(Long orgId, Long adminId,
                         com.Tithaal.Wallet.dto.OrganizationUpdateDto updateDto) {
