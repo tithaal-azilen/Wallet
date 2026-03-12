@@ -120,4 +120,35 @@ public class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(registerDto)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void register_Fail_UsernameBlank() throws Exception {
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setUsername("   ");
+        registerDto.setEmail("valid@example.com");
+        registerDto.setPassword("password123");
+        registerDto.setCity("Test City");
+        registerDto.setPhoneNumber("1234567890");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void register_Fail_PasswordTooShort() throws Exception {
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setUsername("validUser");
+        registerDto.setEmail("valid@example.com");
+        registerDto.setPassword("123"); // Too short
+        registerDto.setCity("Test City");
+        registerDto.setPhoneNumber("1234567890");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerDto)))
+                .andExpect(status().isBadRequest());
+    }
+
 }

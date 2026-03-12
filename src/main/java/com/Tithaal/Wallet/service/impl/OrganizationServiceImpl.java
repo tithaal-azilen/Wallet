@@ -44,15 +44,26 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (userRepository.existsByUsername(registrationDto.getUsername())) {
                         throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Username is already taken!");
                 }
-                if (userRepository.existsByEmail(registrationDto.getEmail())) {
+                if (userRepository.existsByEmail(registrationDto.getEmail().trim())) {
                         throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Email is already taken!");
                 }
 
-                String orgCode = registrationDto.getOrgName().substring(0, 3).toUpperCase()
-                                + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                String orgName = registrationDto.getOrgName().trim();
+                String orgCodePrefix = orgName.length() >= 3 ? orgName.substring(0, 3).toUpperCase()
+                                : orgName.toUpperCase();
+                String orgCode;
+                int attempts = 0;
+                do {
+                        orgCode = orgCodePrefix + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                        attempts++;
+                        if (attempts > 5) {
+                                throw new DomainException(ErrorType.INTERNAL_ERROR,
+                                                "Failed to generate a unique organization code");
+                        }
+                } while (organizationRepository.existsByOrgCode(orgCode));
 
                 Organization organization = Organization.builder()
-                                .name(registrationDto.getOrgName())
+                                .name(orgName)
                                 .orgCode(orgCode)
                                 .status(OrganizationStatus.ACTIVE)
                                 .createdAt(Instant.now())
@@ -62,7 +73,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                 User adminUser = User.builder()
                                 .username(registrationDto.getUsername())
-                                .email(registrationDto.getEmail())
+                                .email(registrationDto.getEmail().trim())
                                 .city(registrationDto.getCity())
                                 .phoneNumber(registrationDto.getPhoneNumber())
                                 .passwordHash(passwordEncoder.encode(registrationDto.getPassword()))
@@ -96,6 +107,16 @@ public class OrganizationServiceImpl implements OrganizationService {
                 validateAdminOwnership(orgId, adminId);
                 Organization organization = organizationRepository.findById(orgId)
                                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Organization not found"));
+
+                boolean hasActiveUsers = userRepository.findAll().stream()
+                                .filter(u -> u.getOrganization() != null && u.getOrganization().getId().equals(orgId))
+                                .anyMatch(u -> u.getStatus() == UserStatus.ACTIVE);
+
+                if (hasActiveUsers) {
+                        throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                                        "Cannot delete organization with active users");
+                }
+
                 organization.setStatus(OrganizationStatus.DELETED);
                 organizationRepository.save(organization);
         }
@@ -111,7 +132,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                 Pageable pageable = PageRequest.of(page, size, sort);
 
-                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getAdminTransactions(orgId, filterDto);
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification
+                                .getAdminTransactions(orgId, filterDto);
                 Page<WalletTransaction> transactions = walletTransactionRepository.findAll(spec, pageable);
 
                 java.util.List<OrganizationTransactionDto> content = transactions.getContent().stream()
@@ -139,13 +161,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         @Override
-        public java.util.List<OrganizationTransactionDto> getAllOrganizationTransactions(Long orgId, Long adminId, String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
+        public java.util.List<OrganizationTransactionDto> getAllOrganizationTransactions(Long orgId, Long adminId,
+                        String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
                 validateAdminOwnership(orgId, adminId);
 
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                                 : Sort.by(sortBy).descending();
 
-                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification.getAdminTransactions(orgId, filterDto);
+                org.springframework.data.jpa.domain.Specification<WalletTransaction> spec = com.Tithaal.Wallet.repository.WalletTransactionSpecification
+                                .getAdminTransactions(orgId, filterDto);
                 java.util.List<WalletTransaction> transactions = walletTransactionRepository.findAll(spec, sort);
 
                 return transactions.stream()
@@ -172,12 +196,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Organization not found"));
 
                 if (updateDto.getName() != null && !updateDto.getName().trim().isEmpty()) {
-                        if (!updateDto.getName().equals(organization.getName())
-                                        && organizationRepository.existsByName(updateDto.getName())) {
+                        String newName = updateDto.getName().trim();
+                        if (!newName.equalsIgnoreCase(organization.getName())
+                                        && organizationRepository.existsByName(newName)) {
                                 throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
                                                 "Organization name already exists!");
                         }
-                        organization.setName(updateDto.getName());
+                        organization.setName(newName);
                 }
                 organizationRepository.save(organization);
         }

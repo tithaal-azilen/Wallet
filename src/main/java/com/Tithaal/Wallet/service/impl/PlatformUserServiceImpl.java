@@ -3,6 +3,7 @@ package com.Tithaal.Wallet.service.impl;
 import com.Tithaal.Wallet.dto.PagedResponse;
 import com.Tithaal.Wallet.dto.UserSummaryDto;
 import com.Tithaal.Wallet.dto.UserFilterDto;
+import com.Tithaal.Wallet.security.CustomUserDetails;
 import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.UserStatus;
 import com.Tithaal.Wallet.exception.DomainException;
@@ -33,7 +34,9 @@ public class PlatformUserServiceImpl implements PlatformUserService {
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<User> usersPage = userRepository.findAllWithFilters(
-                filter.getUsername(), filter.getEmail(), filter.getRole(), filter.getStatus(),
+                filter.getUsername() != null ? filter.getUsername().trim() : null,
+                filter.getEmail() != null ? filter.getEmail().trim() : null,
+                filter.getRole(), filter.getStatus(),
                 filter.getOrganizationId(), pageable);
 
         List<UserSummaryDto> content = usersPage.getContent().stream()
@@ -54,6 +57,25 @@ public class PlatformUserServiceImpl implements PlatformUserService {
     public void updateUserStatus(Long userId, UserStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "User not found with id: " + userId));
+
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails currentUser = (CustomUserDetails) auth.getPrincipal();
+            if (currentUser.getId().equals(userId) && (status == UserStatus.INACTIVE || status == UserStatus.SUSPENDED
+                    || status == UserStatus.DELETED)) {
+                throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                        "Super Admin cannot deactivate their own account");
+            }
+        }
+
+        if (user.getStatus() == status) {
+            return;
+        }
+
+        if (user.getStatus() == UserStatus.DELETED && status == UserStatus.ACTIVE) {
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Cannot activate a deleted user");
+        }
 
         user.setStatus(status);
         userRepository.save(user);

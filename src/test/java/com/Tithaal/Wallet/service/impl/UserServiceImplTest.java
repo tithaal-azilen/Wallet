@@ -323,6 +323,27 @@ class UserServiceImplTest {
         assertEquals("Email is already taken!", exception.getMessage());
     }
 
+    @Test
+    void updateUser_Success_SameEmail() {
+        Long userId = 1L;
+        UpdateUserDto updateDto = new UpdateUserDto();
+        updateDto.setEmail("current@example.com");
+
+        User user = new User();
+        user.setId(userId);
+        user.setEmail("current@example.com");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        // Note: existsByEmail will return true because it exists, but the service
+        // should skip the check if it's the same user.
+        // Actually the service logic I saw earlier: if (!user.getEmail().equals(updateUserDto.getEmail()) && userRepository.existsByEmail(...))
+
+        userService.updateUser(userId, updateDto);
+
+        verify(userRepository).save(user);
+    }
+
+
     // --- deleteUser Tests ---
 
     @Test

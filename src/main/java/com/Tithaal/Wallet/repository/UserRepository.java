@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(:username IS NULL OR u.username ILIKE %:username%) AND " +
             "(:email IS NULL OR u.email ILIKE %:email%) AND " +
             "(:role IS NULL OR u.role = :role) AND " +
-            "(:status IS NULL OR u.status = :status) AND " +
+            "((:status IS NULL AND u.status != com.Tithaal.Wallet.entity.UserStatus.DELETED) OR (u.status = :status)) AND " +
             "(:organizationId IS NULL OR o.id = :organizationId)")
     org.springframework.data.domain.Page<User> findAllWithFilters(
             @org.springframework.data.repository.query.Param("username") String username,

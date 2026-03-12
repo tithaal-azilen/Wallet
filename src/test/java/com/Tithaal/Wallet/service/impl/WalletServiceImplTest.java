@@ -244,6 +244,33 @@ class WalletServiceImplTest {
         assertEquals("Insufficient balance", exception.getMessage());
     }
 
+    @Test
+    void shouldHandleDecimalAmountsCorrectly() {
+        Long walletId = 1L;
+        Long userId = 100L;
+        CreditRequestDto creditDto = new CreditRequestDto();
+        creditDto.setAmount(new BigDecimal("0.10"));
+        creditDto.setCreditCardNumber("1234");
+
+        User user = new User();
+        user.setId(userId);
+
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setUser(user);
+        wallet.setBalance(new BigDecimal("0.20"));
+
+        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
+
+        walletService.TopUpWallet(walletId, creditDto, userId);
+
+        // 0.20 + 0.10 should be exactly 0.30
+        assertEquals(0, new BigDecimal("0.30").compareTo(wallet.getBalance()));
+    }
+
+
     // --- validateWalletOwnership Tests ---
 
     @Test

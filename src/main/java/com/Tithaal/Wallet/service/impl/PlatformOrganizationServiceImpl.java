@@ -33,7 +33,9 @@ public class PlatformOrganizationServiceImpl implements PlatformOrganizationServ
                                 : Sort.by(sortBy).descending();
                 Pageable pageable = PageRequest.of(page, size, sort);
                 Page<Organization> orgsPage = organizationRepository.findAllWithFilters(
-                                filter.getName(), filter.getOrgCode(), filter.getStatus(), filter.getStartDate(),
+                                filter.getName() != null ? filter.getName().trim() : null,
+                                filter.getOrgCode() != null ? filter.getOrgCode().trim() : null,
+                                filter.getStatus(), filter.getStartDate(),
                                 filter.getEndDate(), pageable);
 
                 List<OrganizationDto> content = orgsPage.getContent().stream()
@@ -56,6 +58,15 @@ public class PlatformOrganizationServiceImpl implements PlatformOrganizationServ
                                 .orElseThrow(
                                                 () -> new DomainException(ErrorType.NOT_FOUND,
                                                                 "Organization not found with id: " + orgId));
+
+                if (organization.getStatus() == status) {
+                        return;
+                }
+
+                if (organization.getStatus() == OrganizationStatus.DELETED && status == OrganizationStatus.ACTIVE) {
+                        throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                                        "Cannot activate a deleted organization");
+                }
 
                 organization.setStatus(status);
                 organizationRepository.save(organization);

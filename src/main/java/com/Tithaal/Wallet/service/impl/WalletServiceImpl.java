@@ -34,7 +34,7 @@ public class WalletServiceImpl implements WalletService {
             throw new DomainException(ErrorType.INVALID_INPUT, "Amount must be greater than 0");
         }
 
-        Wallet wallet = walletRepository.findById(walletId)
+        Wallet wallet = walletRepository.findWithLockingById(walletId)
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Wallet not found with id: " + walletId));
 
         wallet.credit(creditRequestDto.getAmount());
@@ -42,7 +42,7 @@ public class WalletServiceImpl implements WalletService {
 
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(savedWallet)
-                .recipientWallet(null) // A top-up doesn't have a distinct recipient wallet, so it's null
+                .recipientWallet(null)
                 .type(TransactionType.CREDIT)
                 .amount(creditRequestDto.getAmount())
                 .description("Wallet credited using credit card number: " + creditRequestDto.getCreditCardNumber())
@@ -72,11 +72,11 @@ public class WalletServiceImpl implements WalletService {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Cannot transfer funds to the same wallet");
         }
 
-        Wallet senderWallet = walletRepository.findById(debitRequestDto.getSendingWalletId())
+        Wallet senderWallet = walletRepository.findWithLockingById(debitRequestDto.getSendingWalletId())
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "Sender wallet not found with id: " + debitRequestDto.getSendingWalletId()));
 
-        Wallet recipientWallet = walletRepository.findById(debitRequestDto.getReceivingWalletId())
+        Wallet recipientWallet = walletRepository.findWithLockingById(debitRequestDto.getReceivingWalletId())
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "Recipient wallet not found with id: " + debitRequestDto.getReceivingWalletId()));
 
@@ -84,11 +84,9 @@ public class WalletServiceImpl implements WalletService {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Insufficient balance");
         }
 
-        // Debit sender
         senderWallet.debit(debitRequestDto.getAmount());
         Wallet savedSenderWallet = walletRepository.save(senderWallet);
 
-        // Credit recipient
         recipientWallet.credit(debitRequestDto.getAmount());
         Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
 

@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -117,4 +118,41 @@ class FeeDeductionServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
         verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
     }
+
+    @Test
+    void processSingleWallet_shouldHandleMonthEndDeduction() {
+        Long walletId = 1L;
+        LocalDate jan31 = LocalDate.of(2023, 1, 31);
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setBalance(new BigDecimal("100.0"));
+        wallet.setNextDeductionDate(jan31);
+
+        when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+
+        feeDeductionService.processSingleWallet(walletId);
+
+        // Should advance to last day of next month (Feb 28 in non-leap year)
+        assertEquals(LocalDate.of(2023, 2, 28), wallet.getNextDeductionDate());
+    }
+
+    @Test
+    void processSingleWallet_shouldHandleLeapYearDeduction() {
+        Long walletId = 1L;
+        LocalDate feb29 = LocalDate.of(2024, 2, 29); // Leap year
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setBalance(new BigDecimal("100.0"));
+        wallet.setNextDeductionDate(feb29);
+
+        when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+
+        feeDeductionService.processSingleWallet(walletId);
+
+        // Next month is March. March has 29.
+        assertEquals(LocalDate.of(2024, 3, 29), wallet.getNextDeductionDate());
+    }
+
 }

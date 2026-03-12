@@ -17,7 +17,7 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     @org.springframework.data.jpa.repository.Query("SELECT o FROM Organization o WHERE " +
             "(:name IS NULL OR o.name ILIKE %:name%) AND " +
             "(:orgCode IS NULL OR o.orgCode = :orgCode) AND " +
-            "(:status IS NULL OR o.status = :status) AND " +
+            "((:status IS NULL AND o.status != com.Tithaal.Wallet.entity.OrganizationStatus.DELETED) OR (o.status = :status)) AND " +
             "(cast(:startDate as timestamp) IS NULL OR o.createdAt >= :startDate) AND " +
             "(cast(:endDate as timestamp) IS NULL OR o.createdAt <= :endDate)")
     org.springframework.data.domain.Page<Organization> findAllWithFilters(
