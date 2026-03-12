@@ -80,6 +80,18 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "Recipient wallet not found with id: " + debitRequestDto.getReceivingWalletId()));
 
+        // Validate sender user is active
+        if (senderWallet.getUser().getStatus() != com.Tithaal.Wallet.entity.UserStatus.ACTIVE) {
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                    "Sender account is not active. Current status: " + senderWallet.getUser().getStatus());
+        }
+
+        // Validate recipient user is active
+        if (recipientWallet.getUser().getStatus() != com.Tithaal.Wallet.entity.UserStatus.ACTIVE) {
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                    "Recipient account is not active. Current status: " + recipientWallet.getUser().getStatus());
+        }
+
         if (senderWallet.getBalance().compareTo(debitRequestDto.getAmount()) < 0) {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Insufficient balance");
         }
