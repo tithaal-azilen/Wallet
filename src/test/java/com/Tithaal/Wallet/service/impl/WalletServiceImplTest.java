@@ -52,6 +52,7 @@ class WalletServiceImplTest {
         wallet.setBalance(BigDecimal.ZERO);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
@@ -114,6 +115,11 @@ class WalletServiceImplTest {
 
         User user = new User();
         user.setId(userId);
+        user.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
+
+        User recipientUser = new User();
+        recipientUser.setId(200L);
+        recipientUser.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
 
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
@@ -122,10 +128,12 @@ class WalletServiceImplTest {
 
         Wallet recipientWallet = new Wallet();
         recipientWallet.setId(2L);
+        recipientWallet.setUser(recipientUser);
         recipientWallet.setBalance(BigDecimal.ZERO);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
-        when(walletRepository.findById(2L)).thenReturn(Optional.of(recipientWallet));
+        when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(senderWallet));
+        when(walletRepository.findWithLockingById(2L)).thenReturn(Optional.of(recipientWallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
@@ -212,7 +220,8 @@ class WalletServiceImplTest {
         senderWallet.setUser(user);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
-        when(walletRepository.findById(2L)).thenReturn(Optional.empty());
+        when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(senderWallet));
+        when(walletRepository.findWithLockingById(2L)).thenReturn(Optional.empty());
 
         DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertTrue(exception.getMessage().contains("Recipient wallet not found"));
@@ -228,6 +237,11 @@ class WalletServiceImplTest {
 
         User user = new User();
         user.setId(userId);
+        user.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
+
+        User recipientUser = new User();
+        recipientUser.setId(200L);
+        recipientUser.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
 
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
@@ -236,9 +250,11 @@ class WalletServiceImplTest {
 
         Wallet recipientWallet = new Wallet();
         recipientWallet.setId(2L);
+        recipientWallet.setUser(recipientUser);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
-        when(walletRepository.findById(2L)).thenReturn(Optional.of(recipientWallet));
+        when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(senderWallet));
+        when(walletRepository.findWithLockingById(2L)).thenReturn(Optional.of(recipientWallet));
 
         DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
         assertEquals("Insufficient balance", exception.getMessage());
@@ -261,6 +277,7 @@ class WalletServiceImplTest {
         wallet.setBalance(new BigDecimal("0.20"));
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 

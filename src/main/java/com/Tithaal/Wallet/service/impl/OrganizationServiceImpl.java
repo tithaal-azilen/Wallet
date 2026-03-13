@@ -126,6 +126,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         int page, int size, String sortBy, String sortDir,
                         com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
                 validateAdminOwnership(orgId, adminId);
+                validateActiveOrganization(orgId);
 
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                                 : Sort.by(sortBy).descending();
@@ -164,6 +165,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         public java.util.List<OrganizationTransactionDto> getAllOrganizationTransactions(Long orgId, Long adminId,
                         String sortBy, String sortDir, com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
                 validateAdminOwnership(orgId, adminId);
+                validateActiveOrganization(orgId);
 
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                                 : Sort.by(sortBy).descending();
@@ -246,6 +248,17 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (admin.getOrganization() == null || !admin.getOrganization().getId().equals(orgId)) {
                         throw new DomainException(ErrorType.FORBIDDEN,
                                         "You do not have permission to access this organization");
+                }
+        }
+
+        private void validateActiveOrganization(Long orgId) {
+                Organization organization = organizationRepository.findById(orgId)
+                                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Organization not found"));
+
+                if (organization.getStatus() != OrganizationStatus.ACTIVE) {
+                        throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                                        "This feature is only available for active organizations. Current status: "
+                                                        + organization.getStatus());
                 }
         }
 

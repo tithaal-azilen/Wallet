@@ -80,7 +80,11 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
                         "Recipient wallet not found with id: " + debitRequestDto.getReceivingWalletId()));
 
-        // Validate sender user is active
+        // Validate sender user status
+        if (senderWallet.getUser().getStatus() == com.Tithaal.Wallet.entity.UserStatus.SUSPENDED) {
+            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                    "Your account is suspended. Transfers are disabled until your balance is non-negative. You may top-up your wallet.");
+        }
         if (senderWallet.getUser().getStatus() != com.Tithaal.Wallet.entity.UserStatus.ACTIVE) {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
                     "Sender account is not active. Current status: " + senderWallet.getUser().getStatus());

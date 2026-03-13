@@ -22,8 +22,19 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with username or email: " + usernameOrEmail));
 
+        if (user.getStatus() == com.Tithaal.Wallet.entity.UserStatus.DELETED) {
+            throw new org.springframework.security.authentication.DisabledException("User account has been permanently deleted");
+        }
+
         if (user.getStatus() == com.Tithaal.Wallet.entity.UserStatus.INACTIVE) {
             throw new org.springframework.security.authentication.DisabledException("User account is inactive");
+        }
+
+        // Block users whose organization has been deleted
+        if (user.getOrganization() != null
+                && user.getOrganization().getStatus() == com.Tithaal.Wallet.entity.OrganizationStatus.DELETED) {
+            throw new org.springframework.security.authentication.DisabledException(
+                    "Organization has been deleted. Contact support for assistance.");
         }
 
         java.util.List<org.springframework.security.core.GrantedAuthority> authorities = new ArrayList<>();

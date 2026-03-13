@@ -109,6 +109,7 @@ public class OrganizationServiceImplTest {
         Page<WalletTransaction> page = new PageImpl<>(List.of(transaction));
 
         when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
+        when(organizationRepository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
         when(walletTransactionRepository.findAll(
                 Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(),
                 any(Pageable.class)))
