@@ -68,6 +68,12 @@ public class UserServiceImpl implements UserService {
         if (registerDto.getOrgCode() != null && !registerDto.getOrgCode().trim().isEmpty()) {
             Organization organization = organizationRepository.findByOrgCode(registerDto.getOrgCode())
                     .orElseThrow(() -> new DomainException(ErrorType.INVALID_INPUT, "Invalid organization code!"));
+
+            if ("PLATFORM_ADMIN".equalsIgnoreCase(organization.getOrgCode())) {
+                throw new DomainException(ErrorType.FORBIDDEN,
+                        "Registration under the platform organization is not allowed");
+            }
+
             user.setOrganization(organization);
         }
 

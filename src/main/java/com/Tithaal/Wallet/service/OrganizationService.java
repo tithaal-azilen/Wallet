@@ -23,4 +23,6 @@ public interface OrganizationService {
 
         PagedResponse<com.Tithaal.Wallet.dto.UserSummaryDto> getOrganizationUsers(Long orgId, Long adminId, int page,
                         int size, String sortBy, String sortDir);
+
+        void updateUserStatus(Long orgId, Long adminId, Long userId, com.Tithaal.Wallet.entity.UserStatus status);
 }

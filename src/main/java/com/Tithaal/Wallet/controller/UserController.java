@@ -46,7 +46,7 @@ public class UserController {
 
     @Operation(summary = "Delete User", description = "Delete a user from the system")
     @DeleteMapping("/{id}")
-    @PreAuthorize("#id == principal.id")
+    @PreAuthorize("#id == principal.id && hasRole('USER')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>("User Deleted Successfully!", HttpStatus.OK);

@@ -240,6 +240,40 @@ public class OrganizationServiceImpl implements OrganizationService {
                                 .build();
         }
 
+        @Override
+        @Transactional
+        public void updateUserStatus(Long orgId, Long adminId, Long userId, UserStatus status) {
+                validateAdminOwnership(orgId, adminId);
+                validateActiveOrganization(orgId);
+
+                User targetUser = userRepository.findById(userId)
+                                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
+                                                "User not found with id: " + userId));
+
+                if (targetUser.getOrganization() == null || !targetUser.getOrganization().getId().equals(orgId)) {
+                        throw new DomainException(ErrorType.FORBIDDEN,
+                                        "User does not belong to your organization");
+                }
+
+                if (adminId.equals(userId) && (status == UserStatus.INACTIVE || status == UserStatus.SUSPENDED
+                                || status == UserStatus.DELETED)) {
+                        throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                                        "Admin cannot deactivate their own account");
+                }
+
+                if (targetUser.getStatus() == status) {
+                        return;
+                }
+
+                if (targetUser.getStatus() == UserStatus.DELETED && status == UserStatus.ACTIVE) {
+                        throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
+                                        "Cannot activate a deleted user");
+                }
+
+                targetUser.setStatus(status);
+                userRepository.save(targetUser);
+        }
+
         private void validateAdminOwnership(Long orgId, Long adminId) {
                 log.info("Validating admin ownership for orgId: " + orgId + " and adminId: " + adminId);
                 User admin = userRepository.findById(adminId)

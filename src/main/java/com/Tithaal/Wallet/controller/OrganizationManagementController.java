@@ -3,6 +3,7 @@ package com.Tithaal.Wallet.controller;
 import com.Tithaal.Wallet.dto.OrganizationUpdateDto;
 import com.Tithaal.Wallet.dto.PagedResponse;
 import com.Tithaal.Wallet.dto.UserSummaryDto;
+import com.Tithaal.Wallet.entity.UserStatus;
 import com.Tithaal.Wallet.security.CustomUserDetails;
 import com.Tithaal.Wallet.service.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,6 +63,20 @@ public class OrganizationManagementController {
         PagedResponse<UserSummaryDto> users = organizationService.getOrganizationUsers(orgId,
                 adminId, page, size, sortBy, sortDir);
         return ResponseEntity.ok(users);
+    }
+
+    @Operation(summary = "Update user status (Admin only)")
+    @PreAuthorize("hasRole('ORG_ADMIN')")
+    @PutMapping("/{orgId}/users/{userId}/status")
+    public ResponseEntity<String> updateUserStatus(
+            @PathVariable Long orgId,
+            @PathVariable Long userId,
+            @RequestParam UserStatus status,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminId = userDetails.getId();
+        organizationService.updateUserStatus(orgId, adminId, userId, status);
+        return ResponseEntity.ok("User status updated successfully to " + status);
     }
 
     @Operation(summary = "Soft delete an organization (Admin only)")

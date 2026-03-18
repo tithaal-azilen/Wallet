@@ -7,8 +7,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import com.Tithaal.Wallet.entity.UserStatus;
+import com.Tithaal.Wallet.entity.OrganizationStatus;
 import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,22 +19,24 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with username or email: " + usernameOrEmail));
 
-        if (user.getStatus() == com.Tithaal.Wallet.entity.UserStatus.DELETED) {
-            throw new org.springframework.security.authentication.DisabledException("User account has been permanently deleted");
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new org.springframework.security.authentication.DisabledException(
+                    "User account has been permanently deleted");
         }
 
-        if (user.getStatus() == com.Tithaal.Wallet.entity.UserStatus.INACTIVE) {
+        if (user.getStatus() == UserStatus.INACTIVE) {
             throw new org.springframework.security.authentication.DisabledException("User account is inactive");
         }
 
         // Block users whose organization has been deleted
         if (user.getOrganization() != null
-                && user.getOrganization().getStatus() == com.Tithaal.Wallet.entity.OrganizationStatus.DELETED) {
+                && user.getOrganization().getStatus() == OrganizationStatus.DELETED) {
             throw new org.springframework.security.authentication.DisabledException(
                     "Organization has been deleted. Contact support for assistance.");
         }

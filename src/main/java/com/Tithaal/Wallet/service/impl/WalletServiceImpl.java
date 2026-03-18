@@ -15,6 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -27,6 +31,11 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
+    @Retryable(
+        retryFor = { CannotAcquireLockException.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     public String TopUpWallet(Long walletId, CreditRequestDto creditRequestDto, Long userId) {
         validateWalletOwnership(walletId, userId);
 
@@ -61,6 +70,11 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
+    @Retryable(
+        retryFor = { CannotAcquireLockException.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     public String Transfer(DebitRequestDto debitRequestDto, Long userId) {
         validateWalletOwnership(debitRequestDto.getSendingWalletId(), userId);
 
@@ -72,13 +86,23 @@ public class WalletServiceImpl implements WalletService {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Cannot transfer funds to the same wallet");
         }
 
-        Wallet senderWallet = walletRepository.findWithLockingById(debitRequestDto.getSendingWalletId())
-                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
-                        "Sender wallet not found with id: " + debitRequestDto.getSendingWalletId()));
+        Long sendingId = debitRequestDto.getSendingWalletId();
+        Long receivingId = debitRequestDto.getReceivingWalletId();
 
-        Wallet recipientWallet = walletRepository.findWithLockingById(debitRequestDto.getReceivingWalletId())
-                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
-                        "Recipient wallet not found with id: " + debitRequestDto.getReceivingWalletId()));
+        Wallet senderWallet;
+        Wallet recipientWallet;
+
+        if (sendingId < receivingId) {
+            senderWallet = walletRepository.findWithLockingById(sendingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found with id: " + sendingId));
+            recipientWallet = walletRepository.findWithLockingById(receivingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found with id: " + receivingId));
+        } else {
+            recipientWallet = walletRepository.findWithLockingById(receivingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found with id: " + receivingId));
+            senderWallet = walletRepository.findWithLockingById(sendingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found with id: " + sendingId));
+        }
 
         // Validate sender user status
         if (senderWallet.getUser().getStatus() == com.Tithaal.Wallet.entity.UserStatus.SUSPENDED) {
