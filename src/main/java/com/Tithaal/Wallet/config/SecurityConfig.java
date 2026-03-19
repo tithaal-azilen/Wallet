@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/organizations", "/error",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**")
                         .permitAll()
                         .requestMatchers("/api/platform/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated())
