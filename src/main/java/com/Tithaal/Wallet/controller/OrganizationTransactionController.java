@@ -3,7 +3,6 @@ package com.Tithaal.Wallet.controller;
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.dto.PagedResponse;
 import com.Tithaal.Wallet.security.CustomUserDetails;
-import com.Tithaal.Wallet.service.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Organization Transactions", description = "Endpoints for viewing organization transactions")
 public class OrganizationTransactionController {
 
-    private final OrganizationService organizationService;
+    private final com.Tithaal.Wallet.service.OrganizationTransactionService organizationTransactionService;
     private final com.Tithaal.Wallet.service.PdfReportService pdfReportService;
 
     @Operation(summary = "Get paginated transactions for an organization (Admin only)")
@@ -34,7 +33,7 @@ public class OrganizationTransactionController {
             @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long adminId = userDetails.getId();
-        PagedResponse<OrganizationTransactionDto> transactions = organizationService.getOrganizationTransactions(orgId,
+        PagedResponse<OrganizationTransactionDto> transactions = organizationTransactionService.getPaginatedTransactions(orgId,
                 adminId, page, size, sortBy, sortDir, filterDto);
         return ResponseEntity.ok(transactions);
     }
@@ -50,7 +49,7 @@ public class OrganizationTransactionController {
             @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long adminId = userDetails.getId();
-        java.util.List<com.Tithaal.Wallet.dto.OrganizationTransactionDto> transactions = organizationService.getAllOrganizationTransactions(orgId, adminId, sortBy, sortDir, filterDto);
+        java.util.List<com.Tithaal.Wallet.dto.OrganizationTransactionDto> transactions = organizationTransactionService.getAllTransactionsList(orgId, adminId, sortBy, sortDir, filterDto);
         byte[] pdfBytes = pdfReportService.generateOrgTransactionReport(transactions);
 
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();

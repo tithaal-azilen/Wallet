@@ -15,8 +15,10 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class IdempotencyFilter extends OncePerRequestFilter {
 
     private final IdempotencyRecordRepository idempotencyRecordRepository;
@@ -55,6 +57,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
                 PrintWriter out = response.getWriter();
                 out.print("{\"error\": \"A request with this Idempotency-Key is currently being processed.\"}");
                 out.flush();
+                log.warn("Idempotency conflict: Request with key {} is already PROCESSING", idempotencyKey);
                 return;
             }
         }
@@ -73,6 +76,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             PrintWriter out = response.getWriter();
             out.print("{\"error\": \"A request with this Idempotency-Key is currently being processed by another thread.\"}");
             out.flush();
+            log.warn("Idempotency conflict: Thread collision detected for key {}", idempotencyKey);
             return;
         }
 
@@ -93,6 +97,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             newRecord.setResponseStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             newRecord.setResponseBody("{\"error\": \"Internal server error occurred during processing.\"}");
             idempotencyRecordRepository.saveAndFlush(newRecord);
+            log.error("Internal error processing request with idempotency key {}", idempotencyKey, e);
             throw e;
         }
     }

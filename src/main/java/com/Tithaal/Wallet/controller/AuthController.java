@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 import com.Tithaal.Wallet.service.AuthService;
+import com.Tithaal.Wallet.dto.TokenRefreshRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,9 +36,8 @@ public class AuthController {
         @PostMapping("/login")
         public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginDto loginDto) {
                 JwtAuthResponse jwtAuthResponse = authService.login(loginDto);
-                String refreshToken = authService.createRefreshToken(loginDto.getUsernameOrEmail());
 
-                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", jwtAuthResponse.getRefreshToken())
                                 .httpOnly(true)
                                 .secure(false)
                                 .path("/api/auth")
@@ -49,21 +49,29 @@ public class AuthController {
                                 .body(jwtAuthResponse);
         }
 
-        @Operation(summary = "Refresh Token", description = "Get a new access token using a refresh token cookie")
+        @Operation(summary = "Refresh Token", description = "Get a new access token using a refresh token from cookie or body")
         @PostMapping("/refreshtoken")
         public ResponseEntity<JwtAuthResponse> refreshtoken(
-                        @CookieValue(name = "refreshToken") String requestRefreshToken) {
-                String[] tokens = authService.refreshToken(requestRefreshToken);
+                        @CookieValue(name = "refreshToken", required = false) String cookieRefreshToken,
+                        @RequestBody(required = false) TokenRefreshRequest request) {
+                
+                String refreshTokenToUse = cookieRefreshToken;
+                if (refreshTokenToUse == null && request != null) {
+                        refreshTokenToUse = request.getRefreshToken();
+                }
 
-                ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens[1])
+                if (refreshTokenToUse == null || refreshTokenToUse.isEmpty()) {
+                        throw new IllegalArgumentException("Refresh Token is required!");
+                }
+
+                JwtAuthResponse jwtAuthResponse = authService.refreshToken(refreshTokenToUse);
+
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", jwtAuthResponse.getRefreshToken())
                                 .httpOnly(true)
                                 .secure(false)
                                 .path("/api/auth")
                                 .maxAge(7 * 24 * 60 * 60)
                                 .build();
-
-                JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-                jwtAuthResponse.setAccessToken(tokens[0]);
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -73,8 +81,15 @@ public class AuthController {
         @Operation(summary = "Logout User", description = "Invalidate refresh token and clear cookie")
         @PostMapping("/logout")
         public ResponseEntity<String> logoutUser(
-                        @CookieValue(name = "refreshToken", required = false) String refreshToken) {
-                authService.logout(refreshToken);
+                        @CookieValue(name = "refreshToken", required = false) String cookieRefreshToken,
+                        @RequestBody(required = false) TokenRefreshRequest request) {
+                
+                String refreshTokenToUse = cookieRefreshToken;
+                if (refreshTokenToUse == null && request != null) {
+                        refreshTokenToUse = request.getRefreshToken();
+                }
+
+                authService.logout(refreshTokenToUse);
 
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                                 .httpOnly(true)

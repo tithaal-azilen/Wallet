@@ -142,65 +142,6 @@ class UserServiceImplTest {
         assertTrue(exception.getMessage().contains("User not found"));
     }
 
-    // --- loginUser Tests ---
-
-    @Test
-    void loginUser_Success() {
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("testuser");
-        loginDto.setPassword("password");
-
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPasswordHash("encodedPassword");
-
-        when(userRepository.findByUsernameOrEmail("testuser", "testuser")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
-
-        String result = userService.loginUser(loginDto);
-
-        assertEquals("User Logged In Successfully!", result);
-    }
-
-    @Test
-    void loginUser_Fail_UserNotFound() {
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("unknown");
-        loginDto.setPassword("password");
-
-        when(userRepository.findByUsernameOrEmail("unknown", "unknown")).thenReturn(Optional.empty());
-
-        DomainException exception = assertThrows(DomainException.class, () -> userService.loginUser(loginDto));
-        assertTrue(exception.getMessage().contains("User not found"));
-    }
-
-    @Test
-    void loginUser_Fail_InvalidPassword() {
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("testuser");
-        loginDto.setPassword("wrongpassword");
-
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPasswordHash("encodedPassword");
-
-        when(userRepository.findByUsernameOrEmail("testuser", "testuser")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("wrongpassword", "encodedPassword")).thenReturn(false);
-
-        DomainException exception = assertThrows(DomainException.class, () -> userService.loginUser(loginDto));
-        assertEquals("Invalid password!", exception.getMessage());
-    }
-
-    @Test
-    void loginUser_Fail_NullOrEmpty() {
-        LoginDto loginDto1 = new LoginDto();
-        assertThrows(DomainException.class, () -> userService.loginUser(loginDto1));
-
-        LoginDto loginDto2 = new LoginDto();
-        loginDto2.setUsernameOrEmail("user");
-        loginDto2.setPassword("");
-        assertThrows(DomainException.class, () -> userService.loginUser(loginDto2));
-    }
 
     // --- getAllUsers Tests ---
 

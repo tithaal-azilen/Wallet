@@ -84,13 +84,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return new String[] { newAccessToken, newRawToken };
     }
 
-    @Override
-    @Transactional
-    public void deleteByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("User not found with id: " + userId));
-        refreshTokenRepository.deleteByUser(user);
-    }
 
     @Override
     @Transactional

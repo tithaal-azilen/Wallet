@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrganizationManagementController {
 
     private final OrganizationService organizationService;
+    private final com.Tithaal.Wallet.service.OrganizationUserService organizationUserService;
 
     @Operation(summary = "Get Organization Details (Admin only)")
     @PreAuthorize("hasRole('ORG_ADMIN')")
@@ -60,7 +61,7 @@ public class OrganizationManagementController {
             @RequestParam(defaultValue = "ASC", required = false) String sortDir) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long adminId = userDetails.getId();
-        PagedResponse<UserSummaryDto> users = organizationService.getOrganizationUsers(orgId,
+        PagedResponse<UserSummaryDto> users = organizationUserService.getOrganizationUsers(orgId,
                 adminId, page, size, sortBy, sortDir);
         return ResponseEntity.ok(users);
     }
@@ -75,7 +76,7 @@ public class OrganizationManagementController {
             Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long adminId = userDetails.getId();
-        organizationService.updateUserStatus(orgId, adminId, userId, status);
+        organizationUserService.updateUserStatus(orgId, adminId, userId, status);
         return ResponseEntity.ok("User status updated successfully to " + status);
     }
 

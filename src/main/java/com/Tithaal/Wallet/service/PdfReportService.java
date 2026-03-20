@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class PdfReportService {
 
     public byte[] generateUserTransactionReport(List<WalletTransactionEntryDto> transactions) {
@@ -52,7 +54,9 @@ public class PdfReportService {
 
             document.add(table);
             document.close();
+            log.info("Generated User Transaction PDF report containing {} records", transactions.size());
         } catch (DocumentException e) {
+            log.error("Failed to generate User Transaction PDF report", e);
             throw new RuntimeException("Error generating PDF", e);
         }
 
@@ -99,7 +103,9 @@ public class PdfReportService {
 
             document.add(table);
             document.close();
+            log.info("Generated Organization Transaction PDF report containing {} records", transactions.size());
         } catch (DocumentException e) {
+            log.error("Failed to generate Organization Transaction PDF report", e);
             throw new RuntimeException("Error generating PDF", e);
         }
 

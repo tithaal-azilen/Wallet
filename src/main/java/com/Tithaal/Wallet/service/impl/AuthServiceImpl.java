@@ -10,6 +10,7 @@ import com.Tithaal.Wallet.security.JwtTokenProvider;
 import com.Tithaal.Wallet.service.AuthService;
 import com.Tithaal.Wallet.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -34,8 +36,15 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtTokenProvider.generateToken(authentication);
 
+        User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "User not found"));
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
         JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
         jwtAuthResponse.setAccessToken(token);
+        jwtAuthResponse.setRefreshToken(refreshToken);
+
+        log.info("User {} logged in successfully", loginDto.getUsernameOrEmail());
 
         return jwtAuthResponse;
     }
@@ -48,14 +57,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String[] refreshToken(String requestRefreshToken) {
-        return refreshTokenService.verifyAndRotate(requestRefreshToken);
+    public JwtAuthResponse refreshToken(String requestRefreshToken) {
+        String[] tokens = refreshTokenService.verifyAndRotate(requestRefreshToken);
+        JwtAuthResponse response = new JwtAuthResponse();
+        response.setAccessToken(tokens[0]);
+        response.setRefreshToken(tokens[1]);
+        return response;
     }
 
     @Override
     public void logout(String refreshToken) {
         if (refreshToken != null && !refreshToken.isEmpty()) {
             refreshTokenService.deleteByToken(refreshToken);
+            log.info("User logged out using refresh token.");
         }
     }
 }

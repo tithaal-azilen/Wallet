@@ -1,28 +1,20 @@
 package com.Tithaal.Wallet.service.impl;
 
-import com.Tithaal.Wallet.dto.OrganizationRegistrationDto;
-import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.entity.*;
-import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
 import com.Tithaal.Wallet.repository.UserRepository;
-import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import com.Tithaal.Wallet.dto.PagedResponse;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
-import org.mockito.Mockito;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,10 +31,7 @@ public class OrganizationServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private WalletTransactionRepository walletTransactionRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    private com.Tithaal.Wallet.service.validator.OrganizationValidator validator;
 
     @InjectMocks
     private OrganizationServiceImpl organizationService;
@@ -71,74 +60,8 @@ public class OrganizationServiceImplTest {
     }
 
     @Test
-    void registerOrganizationAndAdmin_Success() {
-        OrganizationRegistrationDto dto = new OrganizationRegistrationDto();
-        dto.setOrgName("New Org");
-        dto.setUsername("newAdmin");
-        dto.setEmail("new@admin.com");
-        dto.setPassword("password");
-
-        when(organizationRepository.existsByName(dto.getOrgName())).thenReturn(false);
-        when(userRepository.existsByUsername(dto.getUsername())).thenReturn(false);
-        when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false);
-        when(organizationRepository.save(any(Organization.class))).thenReturn(testOrg);
-        when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedPassword");
-
-        String orgCode = organizationService.registerOrganizationAndAdmin(dto);
-
-        assertNotNull(orgCode);
-        assertTrue(orgCode.startsWith("NEW"));
-        verify(organizationRepository).save(any(Organization.class));
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    void getOrganizationTransactions_Success() {
-        WalletTransaction transaction = new WalletTransaction();
-        transaction.setId(1L);
-        transaction.setAmount(BigDecimal.TEN);
-        transaction.setType(TransactionType.CREDIT);
-        transaction.setBalanceAfter(BigDecimal.TEN);
-        transaction.setCreatedAt(Instant.now());
-
-        Wallet wallet = new Wallet();
-        wallet.setId(1L);
-        wallet.setUser(testAdmin);
-        transaction.setWallet(wallet);
-
-        Page<WalletTransaction> page = new PageImpl<>(List.of(transaction));
-
-        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
-        when(organizationRepository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
-        when(walletTransactionRepository.findAll(
-                Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(),
-                any(Pageable.class)))
-                .thenReturn(page);
-
-        PagedResponse<OrganizationTransactionDto> result = organizationService.getOrganizationTransactions(
-                testOrg.getId(),
-                testAdmin.getId(), 0, 10, "createdAt", "DESC", null);
-
-        assertEquals(1, result.getTotalElements());
-        assertEquals(BigDecimal.TEN, result.getContent().get(0).getAmount());
-        assertEquals(testAdmin.getId(), result.getContent().get(0).getUserId());
-        assertEquals(testAdmin.getUsername(), result.getContent().get(0).getUsername());
-    }
-
-    @Test
-    void getOrganizationTransactions_ForbiddenForWrongOrg() {
-        Organization wrongOrg = Organization.builder().id(2L).build();
-        User wrongAdmin = User.builder().id(2L).username("wrongAdmin").organization(wrongOrg).build();
-
-        when(userRepository.findById(wrongAdmin.getId())).thenReturn(Optional.of(wrongAdmin));
-
-        assertThrows(DomainException.class, () -> organizationService.getOrganizationTransactions(testOrg.getId(),
-                wrongAdmin.getId(), 0, 10, "createdAt", "DESC", null));
-    }
-
-    @Test
     void deleteOrganization_Success() {
-        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
+        doNothing().when(validator).validateAdminOwnership(testOrg.getId(), testAdmin.getId());
         when(organizationRepository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
 
         organizationService.deleteOrganization(testOrg.getId(), testAdmin.getId());

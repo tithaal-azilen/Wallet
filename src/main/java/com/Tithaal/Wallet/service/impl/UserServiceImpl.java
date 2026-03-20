@@ -1,6 +1,5 @@
 package com.Tithaal.Wallet.service.impl;
 
-import com.Tithaal.Wallet.dto.LoginDto;
 import com.Tithaal.Wallet.dto.RegisterDto;
 import com.Tithaal.Wallet.dto.UpdateUserDto;
 import com.Tithaal.Wallet.dto.UserDetailDto;
@@ -19,6 +18,7 @@ import com.Tithaal.Wallet.entity.UserStatus;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -78,6 +79,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userRepository.save(user) != null) {
+            log.info("New user registered successfully: {}", registerDto.getUsername());
             return "User Registered Successfully!";
         } else {
             return "User Registration Failed!";
@@ -106,29 +108,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public String loginUser(LoginDto loginDto) {
-        if (loginDto.getUsernameOrEmail() == null || loginDto.getUsernameOrEmail().trim().isEmpty()) {
-            throw new DomainException(ErrorType.INVALID_INPUT, "Username or Email cannot be null or empty!");
-        }
-        if (loginDto.getPassword() == null || loginDto.getPassword().trim().isEmpty()) {
-            throw new DomainException(ErrorType.INVALID_INPUT, "Password cannot be null or empty!");
-        }
 
-        User user = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail())
-                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND,
-                        "User not found with username or email: " + loginDto.getUsernameOrEmail()));
-
-        if (user.getStatus() == UserStatus.INACTIVE) {
-            throw new DomainException(ErrorType.FORBIDDEN, "Account is disabled. Please contact support.");
-        }
-
-        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
-            throw new DomainException(ErrorType.UNAUTHORIZED, "Invalid password!");
-        }
-
-        return "User Logged In Successfully!";
-    }
 
     @Override
     public java.util.List<UserSummaryDto> getAllUsers() {

@@ -11,12 +11,14 @@ import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
@@ -62,6 +65,7 @@ public class WalletServiceImpl implements WalletService {
         WalletTransaction savedTransaction = walletTransactionRepository.save(transaction);
 
         if (savedWallet != null && savedTransaction != null) {
+            log.info("Wallet {} successfully topped up with amount {}", walletId, creditRequestDto.getAmount());
             return "Wallet TopUp successfully ";
         } else {
             return "Wallet TopUp failed!";
@@ -154,6 +158,7 @@ public class WalletServiceImpl implements WalletService {
 
         if (savedSenderWallet != null && savedRecipientWallet != null && senderTransaction != null
                 && recipientTransaction != null) {
+            log.info("Successfully transferred {} from Wallet {} to Wallet {}", debitRequestDto.getAmount(), debitRequestDto.getSendingWalletId(), debitRequestDto.getReceivingWalletId());
             return "Transfer Successful! ";
         } else {
             return "Transfer Failed!";
@@ -168,6 +173,18 @@ public class WalletServiceImpl implements WalletService {
         if (!wallet.getUser().getId().equals(userId)) {
             throw new DomainException(ErrorType.FORBIDDEN, "Wallet does not belong to user with id: " + userId);
         }
+    }
+
+    @Recover
+    public String recoverFromTopUpLockingFailure(CannotAcquireLockException e, Long walletId, CreditRequestDto creditRequestDto, Long userId) {
+        log.error("TopUp Failed: Database lock collision completely exhausted for Wallet ID {}", walletId);
+        throw new DomainException(ErrorType.INTERNAL_ERROR, "System is exceptionally busy. Please try again.");
+    }
+
+    @Recover
+    public String recoverFromTransferLockingFailure(CannotAcquireLockException e, DebitRequestDto debitRequestDto, Long userId) {
+        log.error("Transfer Failed: Database lock collision completely exhausted for Transfer from Wallet {} to Wallet {}", debitRequestDto.getSendingWalletId(), debitRequestDto.getReceivingWalletId());
+        throw new DomainException(ErrorType.INTERNAL_ERROR, "System is exceptionally busy. Please try again.");
     }
 
 }

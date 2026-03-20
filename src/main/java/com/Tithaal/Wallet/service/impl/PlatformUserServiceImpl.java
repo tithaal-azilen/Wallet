@@ -20,9 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlatformUserServiceImpl implements PlatformUserService {
 
     private final UserRepository userRepository;
@@ -79,6 +81,7 @@ public class PlatformUserServiceImpl implements PlatformUserService {
 
         user.setStatus(status);
         userRepository.save(user);
+        log.info("Admin updated user status for User ID {} to {}", userId, status.name());
     }
 
     private UserSummaryDto mapToDto(User user) {

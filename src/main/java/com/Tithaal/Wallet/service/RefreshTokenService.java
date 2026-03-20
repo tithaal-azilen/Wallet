@@ -5,7 +5,6 @@ public interface RefreshTokenService {
 
     String[] verifyAndRotate(String rawToken);
 
-    void deleteByUserId(Long userId);
 
     void deleteByToken(String rawToken);
 }

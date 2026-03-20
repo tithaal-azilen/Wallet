@@ -8,7 +8,7 @@ public interface AuthService {
 
     String createRefreshToken(String usernameOrEmail);
 
-    String[] refreshToken(String requestRefreshToken);
+    JwtAuthResponse refreshToken(String requestRefreshToken);
 
     void logout(String refreshToken);
 }
