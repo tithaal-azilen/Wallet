@@ -19,7 +19,7 @@ public class WalletController {
 
         private final WalletService walletService;
 
-        @PostMapping("/{walletId}/payment")
+        @PostMapping("/{walletId}/topup")
         @PreAuthorize("#userId == principal.id && hasRole('USER')")
         public ResponseEntity<ApiResponse<String>> processPayment(@PathVariable Long userId,
                         @PathVariable Long walletId,

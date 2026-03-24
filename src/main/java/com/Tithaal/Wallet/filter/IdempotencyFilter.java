@@ -2,12 +2,12 @@ package com.Tithaal.Wallet.filter;
 
 import com.Tithaal.Wallet.entity.IdempotencyRecord;
 import com.Tithaal.Wallet.entity.IdempotencyStatus;
-import com.Tithaal.Wallet.repository.IdempotencyRecordRepository;
+import com.Tithaal.Wallet.redis.IdempotencyRecordRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -22,9 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 public class IdempotencyFilter extends OncePerRequestFilter {
 
     private final IdempotencyRecordRepository idempotencyRecordRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public IdempotencyFilter(IdempotencyRecordRepository idempotencyRecordRepository) {
+    public IdempotencyFilter(IdempotencyRecordRepository idempotencyRecordRepository, StringRedisTemplate stringRedisTemplate) {
         this.idempotencyRecordRepository = idempotencyRecordRepository;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -62,15 +64,11 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             }
         }
 
-        IdempotencyRecord newRecord = IdempotencyRecord.builder()
-                .idempotencyKey(idempotencyKey)
-                .requestPath(request.getRequestURI())
-                .status(IdempotencyStatus.PROCESSING)
-                .build();
+        // Use Redis string setIfAbsent as a lock to prevent concurrent identical requests
+        Boolean isAbsent = stringRedisTemplate.opsForValue().setIfAbsent(
+                "IdempLock:" + idempotencyKey, "LOCKED", 15, java.util.concurrent.TimeUnit.MINUTES);
 
-        try {
-            idempotencyRecordRepository.saveAndFlush(newRecord);
-        } catch (DataIntegrityViolationException e) {
+        if (Boolean.FALSE.equals(isAbsent)) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.setContentType("application/json");
             PrintWriter out = response.getWriter();
@@ -79,6 +77,16 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             log.warn("Idempotency conflict: Thread collision detected for key {}", idempotencyKey);
             return;
         }
+
+        IdempotencyRecord newRecord = IdempotencyRecord.builder()
+                .idempotencyKey(idempotencyKey)
+                .requestPath(request.getRequestURI())
+                .status(IdempotencyStatus.PROCESSING)
+                .createdAt(java.time.Instant.now())
+                .updatedAt(java.time.Instant.now())
+                .build();
+
+        idempotencyRecordRepository.save(newRecord);
 
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
@@ -89,14 +97,16 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             newRecord.setResponseStatusCode(responseWrapper.getStatus());
             byte[] responseArray = responseWrapper.getContentAsByteArray();
             newRecord.setResponseBody(new String(responseArray, responseWrapper.getCharacterEncoding()));
-            idempotencyRecordRepository.saveAndFlush(newRecord);
+            newRecord.setUpdatedAt(java.time.Instant.now());
+            idempotencyRecordRepository.save(newRecord);
 
             responseWrapper.copyBodyToResponse();
         } catch (Exception e) {
             newRecord.setStatus(IdempotencyStatus.FAILED);
             newRecord.setResponseStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             newRecord.setResponseBody("{\"error\": \"Internal server error occurred during processing.\"}");
-            idempotencyRecordRepository.saveAndFlush(newRecord);
+            newRecord.setUpdatedAt(java.time.Instant.now());
+            idempotencyRecordRepository.save(newRecord);
             log.error("Internal error processing request with idempotency key {}", idempotencyKey, e);
             throw e;
         }

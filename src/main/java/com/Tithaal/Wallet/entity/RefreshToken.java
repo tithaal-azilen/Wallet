@@ -1,14 +1,14 @@
 package com.Tithaal.Wallet.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.time.Instant;
 
-@Entity
-@Table(name = "refresh_tokens", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "token_hash")
-})
+@RedisHash("RefreshToken")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,16 +17,13 @@ import java.time.Instant;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
-
-    @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
-    @Column(name = "expiry_date", nullable = false)
+    @Indexed
+    private Long userId;
+
     private Instant expiryDate;
+
+    @TimeToLive
+    private Long expiration;
 }

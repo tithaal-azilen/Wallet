@@ -1,0 +1,2 @@
+org.springframework.boot.test.context.TestConfiguration=\
+com.Tithaal.Wallet.TestRedisAutoConfiguration

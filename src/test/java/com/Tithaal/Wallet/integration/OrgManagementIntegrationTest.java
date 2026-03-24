@@ -5,6 +5,7 @@ import com.Tithaal.Wallet.dto.OrganizationUpdateDto;
 import com.Tithaal.Wallet.entity.*;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
 import com.Tithaal.Wallet.repository.UserRepository;
+import com.Tithaal.Wallet.redis.RefreshTokenRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ public class OrgManagementIntegrationTest {
     @Autowired private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private com.Tithaal.Wallet.repository.RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenRepository refreshTokenRepository;
 
     private Organization org1;
     private Organization org2;
