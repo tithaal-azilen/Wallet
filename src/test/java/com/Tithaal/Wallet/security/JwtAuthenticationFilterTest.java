@@ -1,9 +1,12 @@
 package com.Tithaal.Wallet.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,25 +14,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class JwtAuthenticationFilterTest {
 
     @Mock
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Mock
-    private UserDetailsService userDetailsService;
+    private RsaJwtValidator rsaJwtValidator;
 
     @Mock
     private HttpServletRequest request;
@@ -51,13 +49,18 @@ public class JwtAuthenticationFilterTest {
     @Test
     public void shouldAuthenticateUserWhenTokenValid() throws ServletException, IOException {
         String token = "valid-token";
-        String username = "testuser";
-        UserDetails userDetails = new User(username, "password", Collections.emptyList());
+        UUID userId = UUID.randomUUID();
+        String tenantId = "tenant-123";
+        List<String> roles = List.of("ROLE_USER");
+
+        Claims claims = mock(Claims.class);
+        when(claims.get("userId", String.class)).thenReturn(userId.toString());
+        when(claims.get("tenantId", String.class)).thenReturn(tenantId);
+        when(claims.get("status", String.class)).thenReturn("ACTIVE");
+        when(claims.get("roles", List.class)).thenReturn(roles);
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtTokenProvider.validateToken(token)).thenReturn(true);
-        when(jwtTokenProvider.getUsernameFromJWT(token)).thenReturn(username);
-        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        when(rsaJwtValidator.validateAndGetClaims(token)).thenReturn(claims);
 
         jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
@@ -89,7 +92,7 @@ public class JwtAuthenticationFilterTest {
     public void shouldRejectWhenTokenInvalid() throws ServletException, IOException {
         String token = "invalid-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtTokenProvider.validateToken(token)).thenReturn(false);
+        when(rsaJwtValidator.validateAndGetClaims(token)).thenThrow(new JwtException("Invalid token") {});
 
         jwtAuthenticationFilter.doFilter(request, response, filterChain);
 

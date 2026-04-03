@@ -49,6 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UUID userId     = UUID.fromString(claims.get("userId", String.class));
                 String tenantId = claims.get("tenantId", String.class);
                 String status   = claims.get("status", String.class);
+                @SuppressWarnings("unchecked")
                 List<String> roles = claims.get("roles", List.class);
 
                 // Build granted authorities from roles

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.List;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -53,6 +52,4 @@ public class User {
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Wallet> wallets;
 }

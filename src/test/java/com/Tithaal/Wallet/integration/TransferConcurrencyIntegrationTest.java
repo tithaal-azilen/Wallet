@@ -72,7 +72,7 @@ public class TransferConcurrencyIntegrationTest {
             dto.setSendingWalletId(walletAId);
             dto.setReceivingWalletId(walletBId);
             dto.setAmount(new BigDecimal("150.00"));
-            walletService.Transfer(dto, userAId);
+            walletService.transfer(dto, userAId, "ACTIVE");
         }
 
         Wallet finalA = walletRepository.findById(walletAId).orElseThrow();
@@ -92,14 +92,14 @@ public class TransferConcurrencyIntegrationTest {
         dto1.setSendingWalletId(walletAId);
         dto1.setReceivingWalletId(walletBId);
         dto1.setAmount(new BigDecimal("800.00"));
-        walletService.Transfer(dto1, userAId);
+        walletService.transfer(dto1, userAId, "ACTIVE");
 
         DebitRequestDto dto2 = new DebitRequestDto();
         dto2.setSendingWalletId(walletAId);
         dto2.setReceivingWalletId(walletBId);
         dto2.setAmount(new BigDecimal("300.00"));
 
-        assertThrows(DomainException.class, () -> walletService.Transfer(dto2, userAId));
+        assertThrows(DomainException.class, () -> walletService.transfer(dto2, userAId, "ACTIVE"));
 
         Wallet finalA = walletRepository.findById(walletAId).orElseThrow();
         Wallet finalB = walletRepository.findById(walletBId).orElseThrow();

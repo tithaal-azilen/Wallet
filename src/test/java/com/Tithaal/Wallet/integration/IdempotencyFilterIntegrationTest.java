@@ -1,12 +1,8 @@
 package com.Tithaal.Wallet.integration;
 
-import com.Tithaal.Wallet.dto.LoginDto;
-import com.Tithaal.Wallet.dto.RegisterDto;
-import com.Tithaal.Wallet.entity.Organization;
-import com.Tithaal.Wallet.entity.OrganizationStatus;
-import com.Tithaal.Wallet.redis.IdempotencyRecordRepository;
-import com.Tithaal.Wallet.repository.OrganizationRepository;
-import com.Tithaal.Wallet.repository.UserRepository;
+import com.Tithaal.Wallet.dto.DebitRequestDto;
+import com.Tithaal.Wallet.entity.Wallet;
+import com.Tithaal.Wallet.repository.WalletRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -15,13 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
-
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,57 +39,57 @@ public class IdempotencyFilterIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private OrganizationRepository organizationRepository;
+    private WalletRepository walletRepository;
 
-    private String orgCode = "AUTHORD03";
-    private LoginDto loginDto;
+    private DebitRequestDto transferDto;
+    private UsernamePasswordAuthenticationToken auth;
 
     @BeforeEach
     void setUp() throws Exception {
-        organizationRepository.save(Organization.builder()
-                .name("IdempotentOrg2")
-                .orgCode(orgCode)
-                .status(OrganizationStatus.ACTIVE)
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+
+        Wallet senderWallet = walletRepository.save(Wallet.builder()
+                .userId(userId)
+                .balance(new BigDecimal("1000.00"))
                 .createdAt(Instant.now())
                 .build());
 
-        RegisterDto registerDto = new RegisterDto();
-        registerDto.setUsername("idempuser3");
-        registerDto.setEmail("idempuser3@example.com");
-        registerDto.setPassword("password123");
-        registerDto.setCity("Pune");
-        registerDto.setPhoneNumber("1234567893");
-        registerDto.setOrgCode(orgCode);
+        Wallet receiverWallet = walletRepository.save(Wallet.builder()
+                .userId(UUID.randomUUID())
+                .balance(BigDecimal.ZERO)
+                .createdAt(Instant.now())
+                .build());
 
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerDto)))
-                .andExpect(status().isCreated());
+        transferDto = new DebitRequestDto();
+        transferDto.setSendingWalletId(senderWallet.getId());
+        transferDto.setReceivingWalletId(receiverWallet.getId());
+        transferDto.setAmount(new BigDecimal("100.00"));
 
-        loginDto = new LoginDto();
-        loginDto.setUsernameOrEmail("idempuser3");
-        loginDto.setPassword("password123");
+        String[] credentials = { tenantId.toString(), "ACTIVE" };
+        auth = new UsernamePasswordAuthenticationToken(userId, credentials, List.of());
     }
 
     @Test
     void shouldReturnCachedResponseForDuplicateIdempotencyKey() throws Exception {
         String idempotencyKey = UUID.randomUUID().toString();
 
-        MvcResult firstResponse = mockMvc.perform(post("/api/auth/login")
+        MvcResult firstResponse = mockMvc.perform(post("/api/wallet/transfer")
+                .with(SecurityMockMvcRequestPostProcessors.authentication(auth))
                 .header("Idempotency-Key", idempotencyKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginDto)))
+                .content(objectMapper.writeValueAsString(transferDto)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        MvcResult secondResponse = mockMvc.perform(post("/api/auth/login")
+        MvcResult secondResponse = mockMvc.perform(post("/api/wallet/transfer")
+                .with(SecurityMockMvcRequestPostProcessors.authentication(auth))
                 .header("Idempotency-Key", idempotencyKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginDto)))
+                .content(objectMapper.writeValueAsString(transferDto)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         assertEquals(firstResponse.getResponse().getContentAsString(), secondResponse.getResponse().getContentAsString());
     }
-
 }

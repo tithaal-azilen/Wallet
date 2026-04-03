@@ -67,7 +67,7 @@ public class WalletConcurrencyTest {
         Callable<String> task = () -> {
             latch.await();
             try {
-                return walletService.Transfer(debitDto, senderUserId);
+                return walletService.transfer(debitDto, senderUserId, "ACTIVE");
             } catch (Exception e) {
                 return e.getMessage();
             }
