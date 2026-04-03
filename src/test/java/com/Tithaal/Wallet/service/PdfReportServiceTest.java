@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +38,7 @@ public class PdfReportServiceTest {
     public void shouldGenerateOrgReport() {
         OrganizationTransactionDto t1 = new OrganizationTransactionDto();
         t1.setId(1L);
-        t1.setUsername("testuser");
+        t1.setUserId(UUID.randomUUID()); // was: setUsername("testuser") — now UUID
         t1.setType(TransactionType.DEBIT);
         t1.setAmount(BigDecimal.ONE);
         t1.setDescription("Test Transfer");

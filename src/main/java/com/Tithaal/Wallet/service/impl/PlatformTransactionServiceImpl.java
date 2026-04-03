@@ -54,8 +54,7 @@ public class PlatformTransactionServiceImpl implements PlatformTransactionServic
                                 .type(t.getType())
                                 .balanceAfter(t.getBalanceAfter())
                                 .walletId(t.getWallet().getId())
-                                .userId(t.getWallet().getUser().getId())
-                                .username(t.getWallet().getUser().getUsername())
+                                .userId(t.getWallet().getUserId())
                                 .createdAt(t.getCreatedAt())
                                 .build();
         }

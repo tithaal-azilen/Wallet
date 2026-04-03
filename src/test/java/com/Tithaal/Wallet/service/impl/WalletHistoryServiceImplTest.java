@@ -35,7 +35,8 @@ class WalletHistoryServiceImplTest {
 
         @Test
         void getUserHistory_Success() {
-                Long userId = 1L;
+                java.util.UUID userId = java.util.UUID.randomUUID();
+
 
                 Wallet wallet = new Wallet();
                 wallet.setId(101L);
@@ -73,7 +74,8 @@ class WalletHistoryServiceImplTest {
 
         @Test
         void getUserHistory_Success_Empty() {
-                Long userId = 1L;
+                java.util.UUID userId = java.util.UUID.randomUUID();
+
                 
                 org.springframework.data.domain.Page<WalletTransaction> page = new org.springframework.data.domain.PageImpl<>(Collections.emptyList());
                 when(walletTransactionRepository.findAll(Mockito.<org.springframework.data.jpa.domain.Specification<WalletTransaction>>any(), any(org.springframework.data.domain.Pageable.class)))

@@ -85,7 +85,7 @@ public class PdfReportService {
 
             // Headers
             addHeader(table, "Date");
-            addHeader(table, "User");
+            addHeader(table, "User UUID");
             addHeader(table, "Type");
             addHeader(table, "Description");
             addHeader(table, "Amount");
@@ -94,7 +94,7 @@ public class PdfReportService {
             // Data
             for (OrganizationTransactionDto t : transactions) {
                 table.addCell(t.getCreatedAt().toString());
-                table.addCell(t.getUsername());
+                table.addCell(t.getUserId() != null ? t.getUserId().toString() : "");
                 table.addCell(t.getType().toString());
                 table.addCell(t.getDescription());
                 table.addCell(t.getAmount().toString());

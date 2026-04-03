@@ -28,8 +28,9 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
     private final OrganizationValidator validator;
 
     @Override
-    public PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(Long orgId, Long adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
+    public PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(Long orgId, java.util.UUID adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
         validator.validateAdminOwnership(orgId, adminId);
+
         validator.validateActiveOrganization(orgId);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -53,8 +54,9 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
     }
 
     @Override
-    public List<OrganizationTransactionDto> getAllTransactionsList(Long orgId, Long adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
+    public List<OrganizationTransactionDto> getAllTransactionsList(Long orgId, java.util.UUID adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
         validator.validateAdminOwnership(orgId, adminId);
+
         validator.validateActiveOrganization(orgId);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -75,8 +77,7 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
                 .type(t.getType())
                 .balanceAfter(t.getBalanceAfter())
                 .walletId(t.getWallet().getId())
-                .userId(t.getWallet().getUser().getId())
-                .username(t.getWallet().getUser().getUsername())
+                .userId(t.getWallet().getUserId())
                 .createdAt(t.getCreatedAt())
                 .build();
     }

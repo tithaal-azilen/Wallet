@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -21,6 +22,6 @@ public class OrganizationTransactionDto {
     private BigDecimal balanceAfter;
     private Instant createdAt;
     private Long walletId;
-    private Long userId;
-    private String username;
+    /** Auth Service UUID of the wallet owner */
+    private UUID userId;
 }

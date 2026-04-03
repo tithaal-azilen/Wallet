@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "wallet_transaction", uniqueConstraints = {
@@ -24,6 +25,18 @@ public class WalletTransaction {
     @ManyToOne(optional = false)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
+
+    /**
+     * Denormalized UserId for fast reporting (no join with wallet).
+     */
+    @Column(name = "user_id")
+    private UUID userId;
+
+    /**
+     * Denormalized TenantId for fast reporting (no join with wallet/org).
+     */
+    @Column(name = "tenant_id")
+    private UUID tenantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_wallet_id")

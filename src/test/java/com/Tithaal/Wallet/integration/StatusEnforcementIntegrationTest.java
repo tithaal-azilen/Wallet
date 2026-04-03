@@ -2,14 +2,10 @@ package com.Tithaal.Wallet.integration;
 
 import com.Tithaal.Wallet.dto.CreditRequestDto;
 import com.Tithaal.Wallet.dto.DebitRequestDto;
-import com.Tithaal.Wallet.dto.LoginDto;
 import com.Tithaal.Wallet.entity.*;
 import com.Tithaal.Wallet.repository.OrganizationRepository;
-import com.Tithaal.Wallet.redis.RefreshTokenRepository;
-import com.Tithaal.Wallet.repository.UserRepository;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
-import com.Tithaal.Wallet.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,253 +13,114 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.UUID;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Status enforcement tests — migrated to JWT / mock auth model.
+ *
+ * User-level status (SUSPENDED, DELETED, INACTIVE) is now enforced by the Auth Service
+ * at token issuance time (i.e., blocked users don't get a valid JWT).
+ * These tests focus on org-level status enforcement that remains in the Wallet service.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Transactional
 public class StatusEnforcementIntegrationTest {
 
-        @Autowired
-        private MockMvc mockMvc;
-        @Autowired
-        private ObjectMapper objectMapper;
-        @Autowired
-        private UserRepository userRepository;
-        @Autowired
-        private OrganizationRepository organizationRepository;
-        @Autowired
-        private WalletRepository walletRepository;
-        @Autowired
-        private WalletTransactionRepository transactionRepository;
-        @Autowired
-        private PasswordEncoder passwordEncoder;
-        @Autowired private com.Tithaal.Wallet.redis.RefreshTokenRepository refreshTokenRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private OrganizationRepository organizationRepository;
+    @Autowired private WalletRepository walletRepository;
+    @Autowired private WalletTransactionRepository transactionRepository;
 
-        private Organization activeOrg;
-        private Organization deletedOrg;
-        private Organization suspendedOrg;
+    private Organization activeOrg;
+    private Organization suspendedOrg;
+    private Long senderWalletId;
+    private Long recipientWalletId;
+    private Long suspendedOrgId;
+    private Long activeOrgId;
 
-        @BeforeEach
-        void setUp() {
-                refreshTokenRepository.deleteAll();
-                transactionRepository.deleteAll();
-                walletRepository.deleteAll();
-                userRepository.deleteAll();
-                organizationRepository.deleteAll();
+    @BeforeEach
+    void setUp() {
+        transactionRepository.deleteAll();
+        walletRepository.deleteAll();
+        organizationRepository.deleteAll();
 
-                activeOrg = organizationRepository.save(Organization.builder()
-                                .name("ActiveOrg").orgCode("ACT01")
-                                .status(OrganizationStatus.ACTIVE).createdAt(Instant.now()).build());
+        activeOrg = organizationRepository.save(Organization.builder()
+                .name("ActiveOrg").orgCode("ACT01")
+                .status(OrganizationStatus.ACTIVE).createdAt(Instant.now()).build());
+        activeOrgId = activeOrg.getId();
 
-                deletedOrg = organizationRepository.save(Organization.builder()
-                                .name("DeletedOrg").orgCode("DEL01")
-                                .status(OrganizationStatus.DELETED).createdAt(Instant.now()).build());
+        suspendedOrg = organizationRepository.save(Organization.builder()
+                .name("SuspendedOrg").orgCode("SUS01")
+                .status(OrganizationStatus.SUSPENDED).createdAt(Instant.now()).build());
+        suspendedOrgId = suspendedOrg.getId();
 
-                suspendedOrg = organizationRepository.save(Organization.builder()
-                                .name("SuspendedOrg").orgCode("SUS01")
-                                .status(OrganizationStatus.SUSPENDED).createdAt(Instant.now()).build());
-        }
+        UUID userAId = UUID.randomUUID();
+        UUID userBId = UUID.randomUUID();
 
-        private LoginDto loginDto(String username, String password) {
-                LoginDto dto = new LoginDto();
-                dto.setUsernameOrEmail(username);
-                dto.setPassword(password);
-                return dto;
-        }
+        Wallet sender = walletRepository.save(Wallet.builder()
+                .userId(userAId).balance(new BigDecimal("500.00"))
+                .createdAt(Instant.now()).build());
+        senderWalletId = sender.getId();
 
-        private String obtainToken(String username) throws Exception {
-                MvcResult result = mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto(username, "password"))))
-                                .andExpect(status().isOk()).andReturn();
-                return objectMapper.readTree(result.getResponse().getContentAsString()).get("accessToken").asText();
-        }
+        Wallet recipient = walletRepository.save(Wallet.builder()
+                .userId(userBId).balance(new BigDecimal("100.00"))
+                .createdAt(Instant.now()).build());
+        recipientWalletId = recipient.getId();
+    }
 
-        private UsernamePasswordAuthenticationToken authFor(User user, String role) {
-                List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-                CustomUserDetails details = new CustomUserDetails(
-                                user.getId(), user.getEmail(), user.getPasswordHash(), authorities);
-                return new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
-        }
+    @Test
+    @WithMockUser(username = "user1", roles = {"USER"})
+    void shouldAllowTransferForActiveUser() throws Exception {
+        DebitRequestDto dto = new DebitRequestDto();
+        dto.setSendingWalletId(senderWalletId);
+        dto.setReceivingWalletId(recipientWalletId);
+        dto.setAmount(new BigDecimal("50.00"));
 
-        // ==================== USER LOGIN TESTS ====================
+        mockMvc.perform(post("/api/wallet/transfer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+    }
 
-        @Test
-        void deletedUserCannotSignIn() throws Exception {
-                userRepository.save(User.builder()
-                                .username("deleteduser").email("deleted@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.DELETED)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
+    @Test
+    @WithMockUser(username = "user1", roles = {"USER"})
+    void shouldAllowTopUpForValidUser() throws Exception {
+        CreditRequestDto dto = new CreditRequestDto();
+        dto.setCreditCardNumber("4111111111111111");
+        dto.setAmount(new BigDecimal("100.00"));
 
-                mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto("deleteduser", "password"))))
-                                .andExpect(status().isForbidden());
-        }
+        mockMvc.perform(post("/api/wallet/" + senderWalletId + "/payment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+    }
 
-        @Test
-        void inactiveUserCannotSignIn() throws Exception {
-                userRepository.save(User.builder()
-                                .username("inactiveuser").email("inactive@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.INACTIVE)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
+    @Test
+    @WithMockUser(username = "admin1", roles = {"ORG_ADMIN"})
+    void suspendedOrgCannotAccessReporting() throws Exception {
+        mockMvc.perform(get("/api/organizations/transactions/" + suspendedOrgId)
+                .param("page", "0").param("size", "10"))
+                .andExpect(status().isBadRequest());
+    }
 
-                mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto("inactiveuser", "password"))))
-                                .andExpect(status().isForbidden());
-        }
-
-        @Test
-        void suspendedUserCanSignIn() throws Exception {
-                userRepository.save(User.builder()
-                                .username("suspuser").email("susp@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.SUSPENDED)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto("suspuser", "password"))))
-                                .andExpect(status().isOk());
-        }
-
-        @Test
-        void activeUserCanSignIn() throws Exception {
-                userRepository.save(User.builder()
-                                .username("activeuser").email("active@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.ACTIVE)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto("activeuser", "password"))))
-                                .andExpect(status().isOk());
-        }
-
-        // ==================== DELETED ORG USER TESTS ====================
-
-        @Test
-        void userOfDeletedOrgCannotSignIn() throws Exception {
-                userRepository.save(User.builder()
-                                .username("delorgusr").email("delorg@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.ACTIVE)
-                                .organization(deletedOrg).createdAt(Instant.now()).build());
-
-                mockMvc.perform(post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(loginDto("delorgusr", "password"))))
-                                .andExpect(status().isForbidden());
-        }
-
-        // ==================== SUSPENDED USER TRANSFER TESTS ====================
-
-        @Test
-        void suspendedUserCannotTransfer() throws Exception {
-                User suspUser = userRepository.save(User.builder()
-                                .username("suspxfer").email("suspxfer@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.SUSPENDED)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                User recipient = userRepository.save(User.builder()
-                                .username("recipient").email("recip@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.ACTIVE)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                Wallet senderWallet = walletRepository.save(Wallet.builder()
-                                .user(suspUser).balance(new BigDecimal("500.00"))
-                                .createdAt(Instant.now()).build());
-
-                Wallet recipWallet = walletRepository.save(Wallet.builder()
-                                .user(recipient).balance(new BigDecimal("100.00"))
-                                .createdAt(Instant.now()).build());
-
-                DebitRequestDto dto = new DebitRequestDto();
-                dto.setSendingWalletId(senderWallet.getId());
-                dto.setReceivingWalletId(recipWallet.getId());
-                dto.setAmount(new BigDecimal("50.00"));
-
-                // Suspended user can sign in — use their auth context
-                mockMvc.perform(post("/api/user/" + suspUser.getId() + "/wallet/transfer")
-                                .with(authentication(authFor(suspUser, "ROLE_USER")))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(dto)))
-                                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        void suspendedUserCanTopUp() throws Exception {
-                User suspUser = userRepository.save(User.builder()
-                                .username("susptp").email("susptp@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_USER).status(UserStatus.SUSPENDED)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                Wallet wallet = walletRepository.save(Wallet.builder()
-                                .user(suspUser).balance(new BigDecimal("0.00"))
-                                .createdAt(Instant.now()).build());
-
-                CreditRequestDto dto = new CreditRequestDto();
-                dto.setCreditCardNumber("4111111111111111");
-                dto.setAmount(new BigDecimal("100.00"));
-
-                mockMvc.perform(post("/api/user/" + suspUser.getId() + "/wallet/" + wallet.getId() + "/payment")
-                                .with(authentication(authFor(suspUser, "ROLE_USER")))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(dto)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.success").value(true));
-        }
-
-        // ==================== ORG STATUS REPORTING TESTS ====================
-
-        @Test
-        void suspendedOrgCannotAccessReporting() throws Exception {
-                User admin = userRepository.save(User.builder()
-                                .username("suspadmin").email("suspadmin@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_ORG_ADMIN).status(UserStatus.ACTIVE)
-                                .organization(suspendedOrg).createdAt(Instant.now()).build());
-
-                mockMvc.perform(get("/api/organizations/transactions/" + suspendedOrg.getId())
-                                .with(authentication(authFor(admin, "ROLE_ORG_ADMIN")))
-                                .param("page", "0").param("size", "10"))
-                                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        void activeOrgCanAccessReporting() throws Exception {
-                User admin = userRepository.save(User.builder()
-                                .username("actadmin").email("actadmin@test.com")
-                                .passwordHash(passwordEncoder.encode("password"))
-                                .role(Role.ROLE_ORG_ADMIN).status(UserStatus.ACTIVE)
-                                .organization(activeOrg).createdAt(Instant.now()).build());
-
-                mockMvc.perform(get("/api/organizations/transactions/" + activeOrg.getId())
-                                .with(authentication(authFor(admin, "ROLE_ORG_ADMIN")))
-                                .param("page", "0").param("size", "10"))
-                                .andExpect(status().isOk());
-        }
+    @Test
+    @WithMockUser(username = "admin1", roles = {"ORG_ADMIN"})
+    void activeOrgCanAccessReporting() throws Exception {
+        mockMvc.perform(get("/api/organizations/transactions/" + activeOrgId)
+                .param("page", "0").param("size", "10"))
+                .andExpect(status().isOk());
+    }
 }

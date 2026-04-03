@@ -6,48 +6,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class WalletTransactionSpecificationTest {
 
-    @Autowired
-    private WalletTransactionRepository walletTransactionRepository;
+    @Autowired private WalletTransactionRepository walletTransactionRepository;
+    @Autowired private WalletRepository walletRepository;
 
-    @Autowired
-    private WalletRepository walletRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    private User user;
+    private UUID userId;
     private Wallet wallet;
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-                .username("spec_user")
-                .email("spec@example.com")
-                .passwordHash("hash")
-                .role(Role.ROLE_USER)
-                .createdAt(Instant.now())
-                .build();
-        userRepository.save(user);
+        userId = UUID.randomUUID();
 
-        wallet = Wallet.builder()
-                .user(user)
+        wallet = walletRepository.save(Wallet.builder()
+                .userId(userId)
                 .balance(BigDecimal.valueOf(100))
                 .createdAt(Instant.now())
-                .build();
-        walletRepository.save(wallet);
+                .build());
 
         WalletTransaction t1 = WalletTransaction.builder()
                 .wallet(wallet)
@@ -76,7 +65,7 @@ public class WalletTransactionSpecificationTest {
         UserTransactionFilterDto filter = new UserTransactionFilterDto();
         filter.setDescriptionKeyword("coffee");
 
-        Specification<WalletTransaction> spec = WalletTransactionSpecification.getUserTransactions(user.getId(), filter);
+        Specification<WalletTransaction> spec = WalletTransactionSpecification.getUserTransactions(userId, filter);
         List<WalletTransaction> results = walletTransactionRepository.findAll(spec);
 
         assertEquals(1, results.size());
@@ -88,7 +77,7 @@ public class WalletTransactionSpecificationTest {
         UserTransactionFilterDto filter = new UserTransactionFilterDto();
         filter.setType(TransactionType.DEBIT);
 
-        Specification<WalletTransaction> spec = WalletTransactionSpecification.getUserTransactions(user.getId(), filter);
+        Specification<WalletTransaction> spec = WalletTransactionSpecification.getUserTransactions(userId, filter);
         List<WalletTransaction> results = walletTransactionRepository.findAll(spec);
 
         assertEquals(1, results.size());

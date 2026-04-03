@@ -32,7 +32,8 @@ public class OrganizationServiceImplTest {
     private OrganizationServiceImpl organizationService;
 
     private Organization testOrg;
-    private User testAdmin;
+    private java.util.UUID testAdminId;
+
 
     @BeforeEach
     void setUp() {
@@ -44,22 +45,17 @@ public class OrganizationServiceImplTest {
                 .createdAt(Instant.now())
                 .build();
 
-        testAdmin = User.builder()
-                .id(1L)
-                .username("admin")
-                .email("admin@test.com")
-                .role(Role.ROLE_ORG_ADMIN)
-                .organization(testOrg)
-                .status(UserStatus.ACTIVE)
-                .build();
+        testAdminId = java.util.UUID.randomUUID();
+
     }
 
     @Test
     void deleteOrganization_Success() {
-        doNothing().when(validator).validateAdminOwnership(testOrg.getId(), testAdmin.getId());
+        doNothing().when(validator).validateAdminOwnership(testOrg.getId(), testAdminId);
         when(organizationRepository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
 
-        organizationService.deleteOrganization(testOrg.getId(), testAdmin.getId());
+        organizationService.deleteOrganization(testOrg.getId(), testAdminId);
+
 
         assertEquals(OrganizationStatus.DELETED, testOrg.getStatus());
         verify(organizationRepository).save(testOrg);

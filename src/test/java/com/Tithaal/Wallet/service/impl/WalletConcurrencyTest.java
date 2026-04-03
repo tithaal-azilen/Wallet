@@ -1,8 +1,8 @@
 package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.DebitRequestDto;
-import com.Tithaal.Wallet.entity.*;
-import com.Tithaal.Wallet.repository.*;
+import com.Tithaal.Wallet.entity.Wallet;
+import com.Tithaal.Wallet.repository.WalletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,37 +27,17 @@ public class WalletConcurrencyTest {
     @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     private Long senderWalletId;
     private Long recipientWalletId;
-    private Long senderUserId;
+    private UUID senderUserId;
 
     @BeforeEach
     void setUp() {
-        String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8);
-        User sender = User.builder()
-                .username("sender_concurrent_" + uniqueSuffix)
-                .email("sender_c_" + uniqueSuffix + "@example.com")
-                .passwordHash("hash")
-                .role(Role.ROLE_USER)
-                .createdAt(Instant.now())
-                .build();
-        sender = userRepository.save(sender);
-        senderUserId = sender.getId();
-
-        User recipient = User.builder()
-                .username("recipient_concurrent_" + uniqueSuffix)
-                .email("recipient_c_" + uniqueSuffix + "@example.com")
-                .passwordHash("hash")
-                .role(Role.ROLE_USER)
-                .createdAt(Instant.now())
-                .build();
-        recipient = userRepository.save(recipient);
+        senderUserId = UUID.randomUUID();
+        UUID recipientUserId = UUID.randomUUID();
 
         Wallet senderWallet = Wallet.builder()
-                .user(sender)
+                .userId(senderUserId)
                 .balance(BigDecimal.valueOf(100))
                 .createdAt(Instant.now())
                 .build();
@@ -65,7 +45,7 @@ public class WalletConcurrencyTest {
         senderWalletId = senderWallet.getId();
 
         Wallet recipientWallet = Wallet.builder()
-                .user(recipient)
+                .userId(recipientUserId)
                 .balance(BigDecimal.ZERO)
                 .createdAt(Instant.now())
                 .build();
@@ -78,11 +58,11 @@ public class WalletConcurrencyTest {
         int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(1);
-        
+
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setSendingWalletId(senderWalletId);
         debitDto.setReceivingWalletId(recipientWalletId);
-        debitDto.setAmount(BigDecimal.valueOf(20)); // 10 threads * 20 = 200, only 5 should succeed (balance is 100)
+        debitDto.setAmount(BigDecimal.valueOf(20)); // 10 threads * 20 = 200, only 5 should succeed
 
         Callable<String> task = () -> {
             latch.await();
@@ -98,18 +78,15 @@ public class WalletConcurrencyTest {
             futuresList.add(executorService.submit(task));
         }
 
-        latch.countDown(); // Starts all threads at once
+        latch.countDown();
         executorService.shutdown();
         executorService.awaitTermination(30, TimeUnit.SECONDS);
 
         Wallet finalSenderWallet = walletRepository.findById(senderWalletId).get();
         Wallet finalRecipientWallet = walletRepository.findById(recipientWalletId).get();
 
-        // One final check: total balance must remain 100
         BigDecimal totalBalance = finalSenderWallet.getBalance().add(finalRecipientWallet.getBalance());
         assertEquals(0, BigDecimal.valueOf(100).compareTo(totalBalance), "Total balance in system must remain 100");
-        
-        // Final balance of sender should never be negative
         assertTrue(finalSenderWallet.getBalance().compareTo(BigDecimal.ZERO) >= 0);
     }
 

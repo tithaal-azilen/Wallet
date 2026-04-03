@@ -7,7 +7,8 @@ import com.Tithaal.Wallet.dto.PagedResponse;
 import java.util.List;
 
 public interface OrganizationTransactionService {
-    PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(Long orgId, Long adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto);
+    PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(Long orgId, java.util.UUID adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto);
     
-    List<OrganizationTransactionDto> getAllTransactionsList(Long orgId, Long adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto);
+    List<OrganizationTransactionDto> getAllTransactionsList(Long orgId, java.util.UUID adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto);
+
 }

@@ -104,13 +104,11 @@ public class FeeDeductionService {
         walletTransactionRepository.save(transaction);
         log.info("Deducted fee for wallet {}. New Balance: {}", walletId, savedWallet.getBalance());
 
-        // Publish event
-        if (savedWallet.getUser() != null && savedWallet.getUser().getEmail() != null) {
-            eventPublisher.publishEvent(new FeeDeductedEvent(this,
-                    savedWallet.getUser().getEmail(),
-                    walletId,
-                    monthlyFeeAmount,
-                    today));
-        }
+        // Publish fee deducted event — use userId UUID (email lookup is Auth Service's responsibility)
+        eventPublisher.publishEvent(new FeeDeductedEvent(this,
+                savedWallet.getUserId().toString(),
+                walletId,
+                monthlyFeeAmount,
+                today));
     }
 }

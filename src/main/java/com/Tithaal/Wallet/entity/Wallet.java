@@ -5,10 +5,19 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
+/**
+ * Wallet entity.
+ *
+ * user_id and tenant_id are stored as plain UUID columns (not entity FKs).
+ * They are sourced from the Auth Service JWT claims — no local users table needed.
+ */
 @Entity
 @Table(name = "wallet", indexes = {
-        @Index(name = "idx_wallet_next_deduction_date", columnList = "next_deduction_date")
+        @Index(name = "idx_wallet_next_deduction_date", columnList = "next_deduction_date"),
+        @Index(name = "idx_wallet_user_id", columnList = "user_id"),
+        @Index(name = "idx_wallet_tenant_id", columnList = "tenant_id")
 })
 @Getter
 @Setter
@@ -21,9 +30,19 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    /**
+     * UUID of the owner — sourced from Auth Service (JWT "userId" claim).
+     * No FK to a local users table.
+     */
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
+    /**
+     * UUID of the tenant — sourced from Auth Service (JWT "tenantId" claim).
+     * Used to scope queries to a single tenant.
+     */
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @Column(nullable = false)
     private BigDecimal balance;

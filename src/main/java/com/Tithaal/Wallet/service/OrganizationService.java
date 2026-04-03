@@ -1,13 +1,16 @@
 package com.Tithaal.Wallet.service;
 
 import com.Tithaal.Wallet.dto.OrganizationDto;
+import com.Tithaal.Wallet.dto.OrganizationUpdateDto;
+
+import java.util.UUID;
 
 public interface OrganizationService {
-        OrganizationDto getOrganization(Long orgId);
+    OrganizationDto getOrganization(Long orgId);
 
-        void deleteOrganization(Long orgId, Long adminId);
+    void deleteOrganization(Long orgId, UUID adminId);
 
-        OrganizationDto getOrganizationDetails(Long orgId, Long adminId);
+    OrganizationDto getOrganizationDetails(Long orgId, UUID adminId);
 
-        void updateOrganization(Long orgId, Long adminId, com.Tithaal.Wallet.dto.OrganizationUpdateDto updateDto);
+    void updateOrganization(Long orgId, UUID adminId, OrganizationUpdateDto updateDto);
 }

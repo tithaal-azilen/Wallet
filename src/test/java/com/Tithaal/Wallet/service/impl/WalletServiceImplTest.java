@@ -2,7 +2,6 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.CreditRequestDto;
 import com.Tithaal.Wallet.dto.DebitRequestDto;
-import com.Tithaal.Wallet.entity.User;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.exception.DomainException;
@@ -16,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,26 +38,23 @@ class WalletServiceImplTest {
     @Test
     void TopUpWallet_Success() {
         Long walletId = 1L;
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.TEN);
         creditDto.setCreditCardNumber("1234567890123456");
 
-        User user = new User();
-        user.setId(userId);
-
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
-        wallet.setUser(user);
+        wallet.setUserId(userId);
         wallet.setBalance(BigDecimal.ZERO);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
-        String result = walletService.TopUpWallet(walletId, creditDto, userId);
+        String result = walletService.topUpWallet(walletId, creditDto, userId);
+
 
         assertEquals("Wallet TopUp successfully ", result);
         assertEquals(BigDecimal.TEN, wallet.getBalance());
@@ -68,38 +65,34 @@ class WalletServiceImplTest {
     @Test
     void TopUpWallet_Fail_InvalidAmount() {
         Long walletId = 1L;
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.ZERO);
 
-        // We need wallet mock for verification if it's called before amount check?
-        // Logic: validateWalletOwnership -> amount check.
-        // So we need to mock wallet finding first.
-
-        User user = new User();
-        user.setId(userId);
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
-        wallet.setUser(user);
+        wallet.setUserId(userId);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
 
         DomainException exception = assertThrows(DomainException.class,
-                () -> walletService.TopUpWallet(walletId, creditDto, userId));
+                () -> walletService.topUpWallet(walletId, creditDto, userId));
+
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
     @Test
     void TopUpWallet_Fail_WalletNotFound() {
         Long walletId = 1L;
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(BigDecimal.TEN);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
         DomainException exception = assertThrows(DomainException.class,
-                () -> walletService.TopUpWallet(walletId, creditDto, userId));
+                () -> walletService.topUpWallet(walletId, creditDto, userId));
+
         assertTrue(exception.getMessage().contains("Wallet not found"));
     }
 
@@ -107,28 +100,21 @@ class WalletServiceImplTest {
 
     @Test
     void Transfer_Success() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
+        UUID recipientUserId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
         debitDto.setAmount(BigDecimal.TEN);
 
-        User user = new User();
-        user.setId(userId);
-        user.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
-
-        User recipientUser = new User();
-        recipientUser.setId(200L);
-        recipientUser.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
-
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
-        senderWallet.setUser(user);
+        senderWallet.setUserId(userId);
         senderWallet.setBalance(new BigDecimal("100"));
 
         Wallet recipientWallet = new Wallet();
         recipientWallet.setId(2L);
-        recipientWallet.setUser(recipientUser);
+        recipientWallet.setUserId(recipientUserId);
         recipientWallet.setBalance(BigDecimal.ZERO);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
@@ -137,58 +123,56 @@ class WalletServiceImplTest {
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
-        String result = walletService.Transfer(debitDto, userId);
+        String result = walletService.transfer(debitDto, userId, "ACTIVE");
+
 
         assertEquals("Transfer Successful! ", result);
         assertEquals(new BigDecimal("90"), senderWallet.getBalance());
         assertEquals(BigDecimal.TEN, recipientWallet.getBalance());
-
-        verify(walletRepository, times(2)).save(any(Wallet.class)); // Sender and Recipient saved
-        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class)); // 2 transactions
+        verify(walletRepository, times(2)).save(any(Wallet.class));
+        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
     }
 
     @Test
     void Transfer_Fail_InvalidAmount() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setSendingWalletId(1L);
         debitDto.setAmount(BigDecimal.ZERO);
 
-        User user = new User();
-        user.setId(userId);
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
-        senderWallet.setUser(user);
+        senderWallet.setUserId(userId);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
 
-        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.transfer(debitDto, userId, "ACTIVE"));
+
         assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
     @Test
     void Transfer_Fail_SameWallet() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(1L);
 
-        User user = new User();
-        user.setId(userId);
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
-        senderWallet.setUser(user);
+        senderWallet.setUserId(userId);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
 
-        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.transfer(debitDto, userId, "ACTIVE"));
+
         assertEquals("Cannot transfer funds to the same wallet", exception.getMessage());
     }
 
     @Test
     void Transfer_Fail_SenderWalletNotFound() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
@@ -196,84 +180,70 @@ class WalletServiceImplTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.empty());
 
-        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
-        // Expect "Wallet not found" because validateOwnership calls findById first and
-        // throws "Wallet not found"
-        // The original test expected "Sender wallet not found", but validateOwnership
-        // runs first now.
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.transfer(debitDto, userId, "ACTIVE"));
+
         assertTrue(exception.getMessage().contains("Wallet not found"));
     }
 
     @Test
     void Transfer_Fail_RecipientWalletNotFound() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(BigDecimal.TEN);
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
 
-        User user = new User();
-        user.setId(userId);
-
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
-        senderWallet.setUser(user);
+        senderWallet.setUserId(userId);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findWithLockingById(2L)).thenReturn(Optional.empty());
 
-        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.transfer(debitDto, userId, "ACTIVE"));
+
         assertTrue(exception.getMessage().contains("Recipient wallet not found"));
     }
 
     @Test
     void Transfer_Fail_InsufficientBalance() {
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
+        UUID recipientUserId = UUID.randomUUID();
         DebitRequestDto debitDto = new DebitRequestDto();
         debitDto.setAmount(new BigDecimal("100"));
         debitDto.setSendingWalletId(1L);
         debitDto.setReceivingWalletId(2L);
 
-        User user = new User();
-        user.setId(userId);
-        user.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
-
-        User recipientUser = new User();
-        recipientUser.setId(200L);
-        recipientUser.setStatus(com.Tithaal.Wallet.entity.UserStatus.ACTIVE);
-
         Wallet senderWallet = new Wallet();
         senderWallet.setId(1L);
-        senderWallet.setUser(user);
+        senderWallet.setUserId(userId);
         senderWallet.setBalance(BigDecimal.TEN); // 10 < 100
 
         Wallet recipientWallet = new Wallet();
         recipientWallet.setId(2L);
-        recipientWallet.setUser(recipientUser);
+        recipientWallet.setUserId(recipientUserId);
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findWithLockingById(2L)).thenReturn(Optional.of(recipientWallet));
 
-        DomainException exception = assertThrows(DomainException.class, () -> walletService.Transfer(debitDto, userId));
+        DomainException exception = assertThrows(DomainException.class, () -> walletService.transfer(debitDto, userId, "ACTIVE"));
+
         assertEquals("Insufficient balance", exception.getMessage());
     }
 
     @Test
     void shouldHandleDecimalAmountsCorrectly() {
         Long walletId = 1L;
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
         CreditRequestDto creditDto = new CreditRequestDto();
         creditDto.setAmount(new BigDecimal("0.10"));
         creditDto.setCreditCardNumber("1234");
 
-        User user = new User();
-        user.setId(userId);
-
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
-        wallet.setUser(user);
+        wallet.setUserId(userId);
         wallet.setBalance(new BigDecimal("0.20"));
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
@@ -281,26 +251,22 @@ class WalletServiceImplTest {
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(walletTransactionRepository.save(any(WalletTransaction.class))).thenReturn(new WalletTransaction());
 
-        walletService.TopUpWallet(walletId, creditDto, userId);
+        walletService.topUpWallet(walletId, creditDto, userId);
 
-        // 0.20 + 0.10 should be exactly 0.30
+
         assertEquals(0, new BigDecimal("0.30").compareTo(wallet.getBalance()));
     }
-
 
     // --- validateWalletOwnership Tests ---
 
     @Test
     void validateWalletOwnership_Success() {
         Long walletId = 1L;
-        Long userId = 100L;
-
-        User user = new User();
-        user.setId(userId);
+        UUID userId = UUID.randomUUID();
 
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
-        wallet.setUser(user);
+        wallet.setUserId(userId);
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
 
@@ -310,7 +276,7 @@ class WalletServiceImplTest {
     @Test
     void validateWalletOwnership_Fail_WalletNotFound() {
         Long walletId = 1L;
-        Long userId = 100L;
+        UUID userId = UUID.randomUUID();
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
@@ -322,15 +288,12 @@ class WalletServiceImplTest {
     @Test
     void validateWalletOwnership_Fail_WrongUser() {
         Long walletId = 1L;
-        Long userId = 100L;
-        Long anotherUserId = 200L;
-
-        User user = new User();
-        user.setId(anotherUserId); // Different user
+        UUID userId = UUID.randomUUID();
+        UUID anotherUserId = UUID.randomUUID();
 
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
-        wallet.setUser(user);
+        wallet.setUserId(anotherUserId); // Different user
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
 
@@ -338,7 +301,4 @@ class WalletServiceImplTest {
                 () -> walletService.validateWalletOwnership(walletId, userId));
         assertTrue(exception.getMessage().contains("Wallet does not belong to user"));
     }
-
-    // --- deductMonthlyFees Tests ---
-
 }

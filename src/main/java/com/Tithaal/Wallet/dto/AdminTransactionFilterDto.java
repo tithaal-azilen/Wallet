@@ -9,8 +9,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +25,10 @@ public class AdminTransactionFilterDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant endDate;
 
-    private Long userId;
+    private UUID userId;
+    private UUID tenantId;
     private Long walletId;
+
 
     private BigDecimal minAmount;
     private BigDecimal maxAmount;

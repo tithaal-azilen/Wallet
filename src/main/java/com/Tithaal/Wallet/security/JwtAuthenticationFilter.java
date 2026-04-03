@@ -1,61 +1,82 @@
 package com.Tithaal.Wallet.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+/**
+ * JWT Authentication Filter — RS256 edition.
+ *
+ * Validates every incoming Bearer token against the Auth Service's RSA public key.
+ * Extracts identity (userId, tenantId, roles, status) directly from JWT claims.
+ * NO database call is made per request.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final RsaJwtValidator rsaJwtValidator;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        String token = getTokenFromRequest(request);
+        String token = extractBearerToken(request);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token)) {
+            try {
+                Claims claims = rsaJwtValidator.validateAndGetClaims(token);
 
-            String username = jwtTokenProvider.getUsernameFromJWT(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                // Extract identity from token claims — single source of truth
+                UUID userId     = UUID.fromString(claims.get("userId", String.class));
+                String tenantId = claims.get("tenantId", String.class);
+                String status   = claims.get("status", String.class);
+                List<String> roles = claims.get("roles", List.class);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities());
+                // Build granted authorities from roles
+                List<SimpleGrantedAuthority> authorities = roles == null ? List.of() :
+                        roles.stream()
+                             .map(SimpleGrantedAuthority::new)
+                             .collect(Collectors.toList());
 
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Store tenantId + status as credentials array for SecurityUtils
+                String[] credentials = { tenantId, status };
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else if (StringUtils.hasText(token)) {
-            log.warn("Blocked request path {} due to expired or invalid JWT token", request.getRequestURI());
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userId, credentials, authorities);
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } catch (JwtException ex) {
+                log.warn("Blocked request [{}] — invalid/expired JWT: {}", request.getRequestURI(), ex.getMessage());
+            }
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+    private String extractBearerToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
+            return header.substring(7);
         }
         return null;
     }

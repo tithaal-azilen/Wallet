@@ -9,20 +9,21 @@ import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.exception.ErrorType;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
+import com.Tithaal.Wallet.service.EmailService;
 import com.Tithaal.Wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +35,37 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
+    public String addWallet(UUID userId, UUID tenantId) {
+        Wallet wallet = Wallet.builder()
+                .userId(userId)
+                .tenantId(tenantId)
+                .balance(java.math.BigDecimal.ZERO)
+                .createdAt(Instant.now())
+                .nextDeductionDate(calculateNextDeductionDate())
+                .build();
+
+        Wallet saved = walletRepository.save(wallet);
+        log.info("Created wallet {} for user {} tenant {}", saved.getId(), userId, tenantId);
+        return "Wallet created successfully with id: " + saved.getId();
+    }
+
+    private java.time.LocalDate calculateNextDeductionDate() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        int day = today.getDayOfMonth();
+        if (day <= 7)  return today.withDayOfMonth(1).plusMonths(1);
+        if (day <= 14) return today.withDayOfMonth(8).plusMonths(1);
+        if (day <= 21) return today.withDayOfMonth(15).plusMonths(1);
+        return today.withDayOfMonth(22).plusMonths(1);
+    }
+
+    @Override
+    @Transactional
     @Retryable(
         retryFor = { CannotAcquireLockException.class },
         maxAttempts = 3,
         backoff = @Backoff(delay = 100, multiplier = 2)
     )
-    public String TopUpWallet(Long walletId, CreditRequestDto creditRequestDto, Long userId) {
+    public String topUpWallet(Long walletId, CreditRequestDto creditRequestDto, UUID userId) {
         validateWalletOwnership(walletId, userId);
 
         if (creditRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
@@ -59,17 +85,15 @@ public class WalletServiceImpl implements WalletService {
                 .amount(creditRequestDto.getAmount())
                 .description("Wallet credited using credit card number: " + creditRequestDto.getCreditCardNumber())
                 .balanceAfter(savedWallet.getBalance())
+                .userId(savedWallet.getUserId())
+                .tenantId(savedWallet.getTenantId())
                 .createdAt(Instant.now())
                 .build();
 
-        WalletTransaction savedTransaction = walletTransactionRepository.save(transaction);
 
-        if (savedWallet != null && savedTransaction != null) {
-            log.info("Wallet {} successfully topped up with amount {}", walletId, creditRequestDto.getAmount());
-            return "Wallet TopUp successfully ";
-        } else {
-            return "Wallet TopUp failed!";
-        }
+        walletTransactionRepository.save(transaction);
+        log.info("Wallet {} successfully topped up with amount {}", walletId, creditRequestDto.getAmount());
+        return "Wallet TopUp successfully";
     }
 
     @Override
@@ -79,7 +103,7 @@ public class WalletServiceImpl implements WalletService {
         maxAttempts = 3,
         backoff = @Backoff(delay = 100, multiplier = 2)
     )
-    public String Transfer(DebitRequestDto debitRequestDto, Long userId) {
+    public String transfer(DebitRequestDto debitRequestDto, UUID userId, String senderStatus) {
         validateWalletOwnership(debitRequestDto.getSendingWalletId(), userId);
 
         if (debitRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
@@ -90,38 +114,32 @@ public class WalletServiceImpl implements WalletService {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION, "Cannot transfer funds to the same wallet");
         }
 
-        Long sendingId = debitRequestDto.getSendingWalletId();
-        Long receivingId = debitRequestDto.getReceivingWalletId();
-
-        Wallet senderWallet;
-        Wallet recipientWallet;
-
-        if (sendingId < receivingId) {
-            senderWallet = walletRepository.findWithLockingById(sendingId)
-                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found with id: " + sendingId));
-            recipientWallet = walletRepository.findWithLockingById(receivingId)
-                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found with id: " + receivingId));
-        } else {
-            recipientWallet = walletRepository.findWithLockingById(receivingId)
-                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found with id: " + receivingId));
-            senderWallet = walletRepository.findWithLockingById(sendingId)
-                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found with id: " + sendingId));
-        }
-
-        // Validate sender user status
-        if (senderWallet.getUser().getStatus() == com.Tithaal.Wallet.entity.UserStatus.SUSPENDED) {
+        // Validate sender status from JWT claim — no DB join needed
+        if ("SUSPENDED".equals(senderStatus)) {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
                     "Your account is suspended. Transfers are disabled until your balance is non-negative. You may top-up your wallet.");
         }
-        if (senderWallet.getUser().getStatus() != com.Tithaal.Wallet.entity.UserStatus.ACTIVE) {
+        if (!"ACTIVE".equals(senderStatus)) {
             throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
-                    "Sender account is not active. Current status: " + senderWallet.getUser().getStatus());
+                    "Sender account is not active. Current status: " + senderStatus);
         }
 
-        // Validate recipient user is active
-        if (recipientWallet.getUser().getStatus() != com.Tithaal.Wallet.entity.UserStatus.ACTIVE) {
-            throw new DomainException(ErrorType.BUSINESS_RULE_VIOLATION,
-                    "Recipient account is not active. Current status: " + recipientWallet.getUser().getStatus());
+        Long sendingId = debitRequestDto.getSendingWalletId();
+        Long receivingId = debitRequestDto.getReceivingWalletId();
+
+        // Lock in consistent order to prevent deadlocks
+        Wallet senderWallet;
+        Wallet recipientWallet;
+        if (sendingId < receivingId) {
+            senderWallet   = walletRepository.findWithLockingById(sendingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found: " + sendingId));
+            recipientWallet = walletRepository.findWithLockingById(receivingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found: " + receivingId));
+        } else {
+            recipientWallet = walletRepository.findWithLockingById(receivingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Recipient wallet not found: " + receivingId));
+            senderWallet   = walletRepository.findWithLockingById(sendingId)
+                    .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Sender wallet not found: " + sendingId));
         }
 
         if (senderWallet.getBalance().compareTo(debitRequestDto.getAmount()) < 0) {
@@ -134,57 +152,58 @@ public class WalletServiceImpl implements WalletService {
         recipientWallet.credit(debitRequestDto.getAmount());
         Wallet savedRecipientWallet = walletRepository.save(recipientWallet);
 
-        WalletTransaction senderTransaction = WalletTransaction.builder()
+        walletTransactionRepository.save(WalletTransaction.builder()
                 .wallet(savedSenderWallet)
                 .recipientWallet(savedRecipientWallet)
                 .type(TransactionType.DEBIT)
                 .amount(debitRequestDto.getAmount())
-                .description("Transfer to wallet id: " + debitRequestDto.getReceivingWalletId())
+                .description("Transfer to wallet id: " + receivingId)
                 .balanceAfter(savedSenderWallet.getBalance())
+                .userId(savedSenderWallet.getUserId())
+                .tenantId(savedSenderWallet.getTenantId())
                 .createdAt(Instant.now())
-                .build();
-        walletTransactionRepository.save(senderTransaction);
+                .build());
 
-        WalletTransaction recipientTransaction = WalletTransaction.builder()
+
+        walletTransactionRepository.save(WalletTransaction.builder()
                 .wallet(savedRecipientWallet)
                 .recipientWallet(savedSenderWallet)
                 .type(TransactionType.CREDIT)
                 .amount(debitRequestDto.getAmount())
-                .description("Transfer from wallet id: " + debitRequestDto.getSendingWalletId())
+                .description("Transfer from wallet id: " + sendingId)
                 .balanceAfter(savedRecipientWallet.getBalance())
+                .userId(savedRecipientWallet.getUserId())
+                .tenantId(savedRecipientWallet.getTenantId())
                 .createdAt(Instant.now())
-                .build();
-        walletTransactionRepository.save(recipientTransaction);
+                .build());
 
-        if (savedSenderWallet != null && savedRecipientWallet != null && senderTransaction != null
-                && recipientTransaction != null) {
-            log.info("Successfully transferred {} from Wallet {} to Wallet {}", debitRequestDto.getAmount(), debitRequestDto.getSendingWalletId(), debitRequestDto.getReceivingWalletId());
-            return "Transfer Successful! ";
-        } else {
-            return "Transfer Failed!";
-        }
+
+        log.info("Successfully transferred {} from Wallet {} to Wallet {}", debitRequestDto.getAmount(), sendingId, receivingId);
+        return "Transfer Successful!";
     }
 
     @Override
-    public void validateWalletOwnership(Long walletId, Long userId) {
+    public void validateWalletOwnership(Long walletId, UUID userId) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, "Wallet not found with id: " + walletId));
 
-        if (!wallet.getUser().getId().equals(userId)) {
-            throw new DomainException(ErrorType.FORBIDDEN, "Wallet does not belong to user with id: " + userId);
+        if (!wallet.getUserId().equals(userId)) {
+            throw new DomainException(ErrorType.FORBIDDEN, "Wallet does not belong to the authenticated user");
         }
     }
 
     @Recover
-    public String recoverFromTopUpLockingFailure(CannotAcquireLockException e, Long walletId, CreditRequestDto creditRequestDto, Long userId) {
-        log.error("TopUp Failed: Database lock collision completely exhausted for Wallet ID {}", walletId);
+    public String recoverFromTopUpLockingFailure(CannotAcquireLockException e, Long walletId,
+            CreditRequestDto creditRequestDto, UUID userId) {
+        log.error("TopUp Failed: lock exhausted for Wallet ID {}", walletId);
         throw new DomainException(ErrorType.INTERNAL_ERROR, "System is exceptionally busy. Please try again.");
     }
 
     @Recover
-    public String recoverFromTransferLockingFailure(CannotAcquireLockException e, DebitRequestDto debitRequestDto, Long userId) {
-        log.error("Transfer Failed: Database lock collision completely exhausted for Transfer from Wallet {} to Wallet {}", debitRequestDto.getSendingWalletId(), debitRequestDto.getReceivingWalletId());
+    public String recoverFromTransferLockingFailure(CannotAcquireLockException e,
+            DebitRequestDto debitRequestDto, UUID userId, String senderStatus) {
+        log.error("Transfer Failed: lock exhausted for Wallet {} → Wallet {}",
+                debitRequestDto.getSendingWalletId(), debitRequestDto.getReceivingWalletId());
         throw new DomainException(ErrorType.INTERNAL_ERROR, "System is exceptionally busy. Please try again.");
     }
-
 }

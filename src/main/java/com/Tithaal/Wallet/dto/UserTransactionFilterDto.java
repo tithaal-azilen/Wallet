@@ -9,8 +9,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,5 +32,6 @@ public class UserTransactionFilterDto {
     private String referenceId;
     private Long walletId;
     private String descriptionKeyword;
-    private Long recipientId;
+    private UUID recipientId;
+
 }

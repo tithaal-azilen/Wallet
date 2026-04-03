@@ -22,9 +22,11 @@ public class TransactionFilterDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Instant endDate;
 
-    private Long userId;
+    private java.util.UUID userId;
+
     private Long walletId;
-    private Long organizationId;
+    private java.util.UUID tenantId;
+
     
     private BigDecimal minAmount;
     private BigDecimal maxAmount;

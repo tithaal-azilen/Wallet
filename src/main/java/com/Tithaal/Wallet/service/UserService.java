@@ -1,22 +1,10 @@
 package com.Tithaal.Wallet.service;
 
-import java.util.List;
-
-import com.Tithaal.Wallet.dto.RegisterDto;
-import com.Tithaal.Wallet.dto.UpdateUserDto;
-import com.Tithaal.Wallet.dto.UserDetailDto;
-import com.Tithaal.Wallet.dto.UserSummaryDto;
-
+/**
+ * UserService stub — all profile management removed.
+ * Profile operations (register, update, delete) are owned by the Auth Service.
+ * Wallet creation is handled directly by WalletService.addWallet(UUID, UUID).
+ */
 public interface UserService {
-    String registerUser(RegisterDto registerDto);
-
-    String addWallet(Long userId);
-
-    List<UserSummaryDto> getAllUsers();
-
-    UserDetailDto getUserDetails(Long userId);
-
-    void updateUser(Long userId, UpdateUserDto updateDto);
-
-    void deleteUser(Long userId);
+    // Intentionally empty — profile management delegated to Auth Service.
 }
