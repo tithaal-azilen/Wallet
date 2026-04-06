@@ -48,8 +48,8 @@ public class StatusEnforcementIntegrationTest {
     private Organization suspendedOrg;
     private Long senderWalletId;
     private Long recipientWalletId;
-    private Long suspendedOrgId;
-    private Long activeOrgId;
+    private UUID suspendedOrgId;
+    private UUID activeOrgId;
 
     @BeforeEach
     void setUp() {

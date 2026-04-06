@@ -28,7 +28,7 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
     private final OrganizationValidator validator;
 
     @Override
-    public PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(Long orgId, java.util.UUID adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
+    public PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(java.util.UUID orgId, java.util.UUID adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
         validator.validateAdminOwnership(orgId, adminId);
 
         validator.validateActiveOrganization(orgId);
@@ -54,7 +54,7 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
     }
 
     @Override
-    public List<OrganizationTransactionDto> getAllTransactionsList(Long orgId, java.util.UUID adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
+    public List<OrganizationTransactionDto> getAllTransactionsList(java.util.UUID orgId, java.util.UUID adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
         validator.validateAdminOwnership(orgId, adminId);
 
         validator.validateActiveOrganization(orgId);

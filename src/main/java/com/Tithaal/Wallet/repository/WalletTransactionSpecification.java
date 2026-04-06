@@ -67,7 +67,7 @@ public class WalletTransactionSpecification {
     /**
      * Admin transactions for an org — now scoped by tenant UUID (tenantId column on wallet).
      */
-    public static Specification<WalletTransaction> getAdminTransactions(Long orgId, AdminTransactionFilterDto filterDto) {
+    public static Specification<WalletTransaction> getAdminTransactions(UUID orgId, AdminTransactionFilterDto filterDto) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

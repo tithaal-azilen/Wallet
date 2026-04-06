@@ -26,13 +26,13 @@ public class OrganizationTransactionController {
     @PreAuthorize("hasRole('ORG_ADMIN')")
     @GetMapping("/{orgId}")
     public ResponseEntity<PagedResponse<OrganizationTransactionDto>> getTransactions(
-            @PathVariable Long orgId,
+            @PathVariable java.util.UUID orgId,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
             @RequestParam(defaultValue = "DESC", required = false) String sortDir,
             @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {
-        UUID adminId = SecurityUtils.getCurrentUserId();
+        java.util.UUID adminId = SecurityUtils.getCurrentUserId();
         PagedResponse<OrganizationTransactionDto> transactions = organizationTransactionService.getPaginatedTransactions(orgId,
                 adminId, page, size, sortBy, sortDir, filterDto);
         return ResponseEntity.ok(transactions);
@@ -43,7 +43,7 @@ public class OrganizationTransactionController {
     @PreAuthorize("hasRole('ORG_ADMIN')")
     @GetMapping("/{orgId}/download")
     public ResponseEntity<byte[]> downloadTransactions(
-            @PathVariable Long orgId,
+            @PathVariable java.util.UUID orgId,
             @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
             @RequestParam(defaultValue = "DESC", required = false) String sortDir,
             @ModelAttribute com.Tithaal.Wallet.dto.AdminTransactionFilterDto filterDto) {

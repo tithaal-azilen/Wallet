@@ -38,7 +38,7 @@ public class OrganizationServiceImplTest {
     @BeforeEach
     void setUp() {
         testOrg = Organization.builder()
-                .id(1L)
+                .id(java.util.UUID.randomUUID())
                 .name("Test Org")
                 .orgCode("ORG-1234X")
                 .status(OrganizationStatus.ACTIVE)

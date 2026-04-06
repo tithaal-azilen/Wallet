@@ -52,10 +52,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 @SuppressWarnings("unchecked")
                 List<String> roles = claims.get("roles", List.class);
 
-                // Build granted authorities from roles
+                // Build granted authorities from roles — prefixing with ROLE_ for Spring Security compatibility
                 List<SimpleGrantedAuthority> authorities = roles == null ? List.of() :
                         roles.stream()
-                             .map(SimpleGrantedAuthority::new)
+                             .map(role -> {
+                                 String r = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                                 return new SimpleGrantedAuthority(r);
+                             })
                              .collect(Collectors.toList());
 
                 // Store tenantId + status as credentials array for SecurityUtils

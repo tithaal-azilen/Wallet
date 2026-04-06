@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class WalletTopUpIntegrationTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private WalletRepository walletRepository;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private WalletRepository walletRepository;
 
     private UUID userId;
     private Long walletId;
@@ -54,7 +56,7 @@ public class WalletTopUpIntegrationTest {
     }
 
     @Test
-    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = {"USER"})
+    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = { "USER" })
     void shouldTopUpWalletSuccessfully() throws Exception {
         CreditRequestDto dto = new CreditRequestDto();
         dto.setCreditCardNumber("4111111111111111");
@@ -70,7 +72,7 @@ public class WalletTopUpIntegrationTest {
     }
 
     @Test
-    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = {"USER"})
+    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = { "USER" })
     void shouldFailTopUpWithZeroAmount() throws Exception {
         CreditRequestDto dto = new CreditRequestDto();
         dto.setCreditCardNumber("4111111111111111");
@@ -83,7 +85,7 @@ public class WalletTopUpIntegrationTest {
     }
 
     @Test
-    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = {"USER"})
+    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = { "USER" })
     void shouldFailTopUpWithNegativeAmount() throws Exception {
         CreditRequestDto dto = new CreditRequestDto();
         dto.setCreditCardNumber("4111111111111111");
@@ -96,7 +98,7 @@ public class WalletTopUpIntegrationTest {
     }
 
     @Test
-    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = {"USER"})
+    @org.springframework.security.test.context.support.WithMockUser(username = "testuser", roles = { "USER" })
     void shouldFailTopUpWithMissingCardNumber() throws Exception {
         CreditRequestDto dto = new CreditRequestDto();
         dto.setAmount(new BigDecimal("50.00"));

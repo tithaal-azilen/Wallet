@@ -74,14 +74,14 @@ public class UserRepositoryTest {
 
     @Test
     void findAllWithFilters_ShouldFilterByPartialUsername() {
-        Page<User> result = userRepository.findAllWithFilters("john_doe_" + uniqueSuffix, null, null, null, null, PageRequest.of(0, 10));
+        Page<User> result = userRepository.findAllWithFilters("john_doe_" + uniqueSuffix, null, null, null, (java.util.UUID) null, PageRequest.of(0, 10));
         assertEquals(1, result.getTotalElements());
         assertTrue(result.getContent().get(0).getUsername().startsWith("john_doe_" + uniqueSuffix));
     }
 
     @Test
     void findAllWithFilters_ShouldFilterByRole() {
-        Page<User> result = userRepository.findAllWithFilters(null, null, Role.ROLE_ORG_ADMIN, null, null, PageRequest.of(0, 10));
+        Page<User> result = userRepository.findAllWithFilters(null, null, Role.ROLE_ORG_ADMIN, null, (java.util.UUID) null, PageRequest.of(0, 10));
         assertEquals(1, result.getTotalElements());
         assertTrue(result.getContent().get(0).getUsername().startsWith("jane_admin_" + uniqueSuffix));
     }
