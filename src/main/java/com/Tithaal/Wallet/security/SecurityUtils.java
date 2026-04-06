@@ -53,4 +53,18 @@ public class SecurityUtils {
         }
         return null;
     }
+
+    /**
+     * Checks if the current authenticated user has a specific role.
+     * Expects role name with or without "ROLE_" prefix.
+     */
+    public static boolean hasRole(String role) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return false;
+        }
+        String roleToChecked = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(roleToChecked));
+    }
 }

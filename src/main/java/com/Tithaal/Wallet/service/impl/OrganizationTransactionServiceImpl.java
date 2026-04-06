@@ -4,19 +4,22 @@ import com.Tithaal.Wallet.dto.AdminTransactionFilterDto;
 import com.Tithaal.Wallet.dto.OrganizationTransactionDto;
 import com.Tithaal.Wallet.dto.PagedResponse;
 import com.Tithaal.Wallet.entity.WalletTransaction;
+import com.Tithaal.Wallet.exception.APIException;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionSpecification;
+import com.Tithaal.Wallet.security.SecurityUtils;
 import com.Tithaal.Wallet.service.OrganizationTransactionService;
-import com.Tithaal.Wallet.service.validator.OrganizationValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,13 +28,10 @@ import java.util.stream.Collectors;
 public class OrganizationTransactionServiceImpl implements OrganizationTransactionService {
 
     private final WalletTransactionRepository walletTransactionRepository;
-    private final OrganizationValidator validator;
 
     @Override
     public PagedResponse<OrganizationTransactionDto> getPaginatedTransactions(java.util.UUID orgId, java.util.UUID adminId, int page, int size, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
-        validator.validateAdminOwnership(orgId, adminId);
-
-        validator.validateActiveOrganization(orgId);
+        validateTenantAccess(orgId);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -55,9 +55,7 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
 
     @Override
     public List<OrganizationTransactionDto> getAllTransactionsList(java.util.UUID orgId, java.util.UUID adminId, String sortBy, String sortDir, AdminTransactionFilterDto filterDto) {
-        validator.validateAdminOwnership(orgId, adminId);
-
-        validator.validateActiveOrganization(orgId);
+        validateTenantAccess(orgId);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -67,6 +65,26 @@ public class OrganizationTransactionServiceImpl implements OrganizationTransacti
         return transactions.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    private void validateTenantAccess(UUID orgId) {
+        String currentTenantId = SecurityUtils.getCurrentTenantId();
+        String currentStatus = SecurityUtils.getCurrentStatus();
+
+        if (currentTenantId == null || !UUID.fromString(currentTenantId).equals(orgId)) {
+            log.error("Access denied: Admin {} attempted to access organization {}", SecurityUtils.getCurrentUserId(), orgId);
+            throw new APIException(HttpStatus.FORBIDDEN, "Access denied: You do not have ownership of this organization");
+        }
+
+        if (currentStatus == null || !currentStatus.equalsIgnoreCase("ACTIVE")) {
+            log.error("Access denied: Organization {} is not ACTIVE (Status: {})", orgId, currentStatus);
+            throw new APIException(HttpStatus.FORBIDDEN, "Access denied: Organization is not active");
+        }
+
+        if (!SecurityUtils.hasRole("ORG_ADMIN")) {
+            log.error("Access denied: Admin {} does not have ORG_ADMIN role", SecurityUtils.getCurrentUserId());
+            throw new APIException(HttpStatus.FORBIDDEN, "Access denied: Required role ORG_ADMIN not found");
+        }
     }
 
     private OrganizationTransactionDto mapToDto(WalletTransaction t) {

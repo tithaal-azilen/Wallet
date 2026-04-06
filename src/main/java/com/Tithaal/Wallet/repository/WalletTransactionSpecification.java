@@ -72,12 +72,7 @@ public class WalletTransactionSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             // Scope to tenant — use denormalized tenantId column
-            // orgId is still passed as Long in some contexts; we need to decide if we use orgId or UUID.
-            // For now, if we don't have the UUID yet, we still join. 
-            // BUT the goal is to use denormalized UUID. 
-            // If orgId is Long, we might still need a join to organizations table or just use the UUID if passed.
-            // Assuming tenantId in token is UUID, and we pass UUID to this method eventually.
-            predicates.add(cb.equal(root.get("tenantId"), filterDto.getTenantId()));
+            predicates.add(cb.equal(root.get("tenantId"), orgId));
 
 
             if (filterDto != null) {
