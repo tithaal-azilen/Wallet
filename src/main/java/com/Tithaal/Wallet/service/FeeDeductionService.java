@@ -1,5 +1,6 @@
 package com.Tithaal.Wallet.service;
 
+import com.Tithaal.Wallet.client.AuthServiceClient;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.entity.TransactionType;
@@ -30,6 +31,7 @@ public class FeeDeductionService {
     private final WalletRepository walletRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuthServiceClient authServiceClient;
 
     @Value("${wallet.monthly.fee.amount}")
     private BigDecimal monthlyFeeAmount;
@@ -104,11 +106,17 @@ public class FeeDeductionService {
         walletTransactionRepository.save(transaction);
         log.info("Deducted fee for wallet {}. New Balance: {}", walletId, savedWallet.getBalance());
 
-        // Publish fee deducted event — use userId UUID (email lookup is Auth Service's responsibility)
-        eventPublisher.publishEvent(new FeeDeductedEvent(this,
-                savedWallet.getUserId().toString(),
-                walletId,
-                monthlyFeeAmount,
-                today));
+        // Fetch user email from Auth Service for notification
+        String email = authServiceClient.getUserEmail(savedWallet.getUserId());
+        if (email != null) {
+            eventPublisher.publishEvent(new FeeDeductedEvent(this,
+                    email,
+                    walletId,
+                    monthlyFeeAmount,
+                    today));
+        } else {
+            log.warn("Could not publish FeeDeductedEvent for wallet {}: email not found for userId {}",
+                    walletId, savedWallet.getUserId());
+        }
     }
 }

@@ -7,7 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import com.Tithaal.Wallet.security.RsaJwtValidator;
+import com.Tithaal.Wallet.client.AuthServiceClient;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -27,6 +30,12 @@ public class WalletConcurrencyTest {
     @Autowired
     private WalletRepository walletRepository;
 
+    @MockitoBean
+    private RsaJwtValidator rsaJwtValidator;
+
+    @MockitoBean
+    private AuthServiceClient authServiceClient;
+
     private Long senderWalletId;
     private Long recipientWalletId;
     private UUID senderUserId;
@@ -38,6 +47,7 @@ public class WalletConcurrencyTest {
 
         Wallet senderWallet = Wallet.builder()
                 .userId(senderUserId)
+                .tenantId(UUID.randomUUID())
                 .balance(BigDecimal.valueOf(100))
                 .createdAt(Instant.now())
                 .build();
@@ -46,6 +56,7 @@ public class WalletConcurrencyTest {
 
         Wallet recipientWallet = Wallet.builder()
                 .userId(recipientUserId)
+                .tenantId(UUID.randomUUID())
                 .balance(BigDecimal.ZERO)
                 .createdAt(Instant.now())
                 .build();
@@ -86,7 +97,12 @@ public class WalletConcurrencyTest {
         Wallet finalRecipientWallet = walletRepository.findById(recipientWalletId).get();
 
         BigDecimal totalBalance = finalSenderWallet.getBalance().add(finalRecipientWallet.getBalance());
-        assertEquals(0, BigDecimal.valueOf(100).compareTo(totalBalance), "Total balance in system must remain 100");
+        System.out.println("Final Sender Balance: " + finalSenderWallet.getBalance());
+        System.out.println("Final Recipient Balance: " + finalRecipientWallet.getBalance());
+        System.out.println("Final Total Balance: " + totalBalance);
+        
+        assertEquals(0, BigDecimal.valueOf(100).compareTo(totalBalance), 
+            "Total balance in system must remain 100, but was " + totalBalance);
         assertTrue(finalSenderWallet.getBalance().compareTo(BigDecimal.ZERO) >= 0);
     }
 

@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 /**
- * Wallet operations — userId is always extracted from the JWT token, never from the URL.
+ * Wallet operations — userId is always extracted from the JWT token, never from
+ * the URL.
  */
 @RestController
 @RequestMapping("/api/wallet")

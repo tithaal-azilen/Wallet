@@ -31,6 +31,12 @@ class FeeDeductionServiceTest {
     @Mock
     private WalletTransactionRepository walletTransactionRepository;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private com.Tithaal.Wallet.client.AuthServiceClient authServiceClient;
+
     @InjectMocks
     private FeeDeductionService feeDeductionService;
 
@@ -43,6 +49,7 @@ class FeeDeductionServiceTest {
     void deductFees_shouldProcessEligibleWallets() {
         Wallet wallet = new Wallet();
         wallet.setId(1L);
+        wallet.setUserId(java.util.UUID.randomUUID());
         wallet.setBalance(new BigDecimal("100.0"));
         wallet.setNextDeductionDate(LocalDate.now());
 
@@ -53,6 +60,7 @@ class FeeDeductionServiceTest {
         // Mock findWithLockingById because processSingleWallet calls it
         when(walletRepository.findWithLockingById(1L)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+        when(authServiceClient.getUserEmail(any(java.util.UUID.class))).thenReturn("test@example.com");
 
         feeDeductionService.deductFees();
 
@@ -66,16 +74,19 @@ class FeeDeductionServiceTest {
         LocalDate today = LocalDate.now();
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
+        wallet.setUserId(java.util.UUID.randomUUID());
         wallet.setBalance(new BigDecimal("100.0"));
         wallet.setNextDeductionDate(today);
 
         when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+        when(authServiceClient.getUserEmail(any(java.util.UUID.class))).thenReturn("test@example.com");
 
         feeDeductionService.processSingleWallet(walletId);
 
         verify(walletRepository).save(wallet);
         verify(walletTransactionRepository).save(any(WalletTransaction.class));
+        verify(eventPublisher).publishEvent(any(com.Tithaal.Wallet.event.FeeDeductedEvent.class));
         assert wallet.getBalance().compareTo(new BigDecimal("50.0")) == 0;
         assert wallet.getNextDeductionDate().equals(today.plusMonths(1));
         assert wallet.getLastDeductionAttempt().equals(today);
@@ -87,6 +98,7 @@ class FeeDeductionServiceTest {
         LocalDate today = LocalDate.now();
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
+        wallet.setUserId(java.util.UUID.randomUUID());
         wallet.setBalance(new BigDecimal("10.0")); // Less than fee 50.0
         wallet.setNextDeductionDate(today);
 
@@ -125,11 +137,13 @@ class FeeDeductionServiceTest {
         LocalDate jan31 = LocalDate.of(2023, 1, 31);
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
+        wallet.setUserId(java.util.UUID.randomUUID());
         wallet.setBalance(new BigDecimal("100.0"));
         wallet.setNextDeductionDate(jan31);
 
         when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+        when(authServiceClient.getUserEmail(any(java.util.UUID.class))).thenReturn("test@example.com");
 
         feeDeductionService.processSingleWallet(walletId);
 
@@ -143,11 +157,13 @@ class FeeDeductionServiceTest {
         LocalDate feb29 = LocalDate.of(2024, 2, 29); // Leap year
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
+        wallet.setUserId(java.util.UUID.randomUUID());
         wallet.setBalance(new BigDecimal("100.0"));
         wallet.setNextDeductionDate(feb29);
 
         when(walletRepository.findWithLockingById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenReturn(wallet);
+        when(authServiceClient.getUserEmail(any(java.util.UUID.class))).thenReturn("test@example.com");
 
         feeDeductionService.processSingleWallet(walletId);
 

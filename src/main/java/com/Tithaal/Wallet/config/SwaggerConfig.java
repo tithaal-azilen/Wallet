@@ -33,7 +33,7 @@ public class SwaggerConfig {
         public GroupedOpenApi publicApi() {
                 return GroupedOpenApi.builder()
                                 .group("users")
-                                .pathsToMatch("/api/auth/**", "/api/ledger/**", "/api/users/**", "/api/user/**")
+                                .pathsToMatch("/api/wallet/**", "/api/ledger/**", "/api/users/**")
                                 .pathsToExclude("/api/organizations/**")
                                 .build();
         }
@@ -42,7 +42,7 @@ public class SwaggerConfig {
         public GroupedOpenApi adminApi() {
                 return GroupedOpenApi.builder()
                                 .group("admin")
-                                .pathsToMatch("/api/auth/**", "/api/organizations/**")
+                                .pathsToMatch("/api/organizations/**")
                                 .pathsToExclude("/api/auth/register/**")
                                 .build();
         }
@@ -51,7 +51,7 @@ public class SwaggerConfig {
         public GroupedOpenApi platformApi() {
                 return GroupedOpenApi.builder()
                                 .group("super_admin")
-                                .pathsToMatch("/api/platform/**", "/api/auth/login")
+                                .pathsToMatch("/api/platform/**")
                                 .build();
         }
 }

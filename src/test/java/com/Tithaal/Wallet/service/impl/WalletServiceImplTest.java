@@ -30,6 +30,12 @@ class WalletServiceImplTest {
     @Mock
     private WalletTransactionRepository walletTransactionRepository;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private com.Tithaal.Wallet.client.AuthServiceClient authServiceClient;
+
     @InjectMocks
     private WalletServiceImpl walletService;
 
@@ -56,7 +62,7 @@ class WalletServiceImplTest {
         String result = walletService.topUpWallet(walletId, creditDto, userId);
 
 
-        assertEquals("Wallet TopUp successfully ", result);
+        assertEquals("Wallet TopUp successfully", result);
         assertEquals(BigDecimal.TEN, wallet.getBalance());
         verify(walletRepository).save(wallet);
         verify(walletTransactionRepository).save(any(WalletTransaction.class));
@@ -126,7 +132,7 @@ class WalletServiceImplTest {
         String result = walletService.transfer(debitDto, userId, "ACTIVE");
 
 
-        assertEquals("Transfer Successful! ", result);
+        assertEquals("Transfer Successful!", result);
         assertEquals(new BigDecimal("90"), senderWallet.getBalance());
         assertEquals(BigDecimal.TEN, recipientWallet.getBalance());
         verify(walletRepository, times(2)).save(any(Wallet.class));
@@ -299,6 +305,26 @@ class WalletServiceImplTest {
 
         DomainException exception = assertThrows(DomainException.class,
                 () -> walletService.validateWalletOwnership(walletId, userId));
-        assertTrue(exception.getMessage().contains("Wallet does not belong to user"));
+        assertTrue(exception.getMessage().contains("Wallet does not belong to the authenticated user"));
+    }
+    @Test
+    void addWallet_Success() {
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        String expectedEmail = "test@example.com";
+
+        when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> {
+            Wallet w = invocation.getArgument(0);
+            w.setId(1L);
+            return w;
+        });
+        when(authServiceClient.getUserEmail(userId)).thenReturn(expectedEmail);
+
+        String result = walletService.addWallet(userId, tenantId);
+
+        assertTrue(result.contains("Wallet created successfully"));
+        verify(walletRepository).save(any(Wallet.class));
+        verify(authServiceClient).getUserEmail(userId);
+        verify(eventPublisher).publishEvent(any(com.Tithaal.Wallet.event.WalletCreatedEvent.class));
     }
 }

@@ -35,7 +35,7 @@ public class WalletHistoryController {
     private final PdfReportService pdfReportService;
 
     @Operation(summary = "Get My Transaction History", description = "Retrieve paginated transaction history for the authenticated user")
-    @GetMapping("/me")
+    @GetMapping("/user")
     public ResponseEntity<PagedResponse<WalletTransactionEntryDto>> getUserHistory(
             @ModelAttribute UserTransactionFilterDto filterDto,
             @RequestParam(defaultValue = "0") int page,
@@ -43,13 +43,13 @@ public class WalletHistoryController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         UUID userId = SecurityUtils.getCurrentUserId();
-        PagedResponse<WalletTransactionEntryDto> ledger =
-                walletHistoryService.getUserHistory(userId, filterDto, page, size, sortBy, sortDir);
+        PagedResponse<WalletTransactionEntryDto> ledger = walletHistoryService.getUserHistory(userId, filterDto, page,
+                size, sortBy, sortDir);
         return ResponseEntity.ok(ledger);
     }
 
     @Operation(summary = "Get Wallet Transaction History", description = "Retrieve transaction history for a specific wallet owned by the authenticated user")
-    @GetMapping("/me/wallet/{walletId}")
+    @GetMapping("/user/wallet/{walletId}")
     public ResponseEntity<List<WalletTransactionEntryDto>> getWalletHistory(
             @PathVariable Long walletId) {
         UUID userId = SecurityUtils.getCurrentUserId();
@@ -59,14 +59,14 @@ public class WalletHistoryController {
     }
 
     @Operation(summary = "Download My Transaction History as PDF", description = "Download transaction history for the authenticated user as a PDF file")
-    @GetMapping("/me/download")
+    @GetMapping("/user/download")
     public ResponseEntity<byte[]> downloadUserHistory(
             @ModelAttribute UserTransactionFilterDto filterDto,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         UUID userId = SecurityUtils.getCurrentUserId();
-        List<WalletTransactionEntryDto> transactions =
-                walletHistoryService.getAllUserHistory(userId, filterDto, sortBy, sortDir);
+        List<WalletTransactionEntryDto> transactions = walletHistoryService.getAllUserHistory(userId, filterDto, sortBy,
+                sortDir);
         byte[] pdfBytes = pdfReportService.generateUserTransactionReport(transactions);
 
         HttpHeaders headers = new HttpHeaders();

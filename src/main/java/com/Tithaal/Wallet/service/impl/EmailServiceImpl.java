@@ -23,6 +23,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendWalletCreationEmail(String toEmail, Long walletId) {
+        if (toEmail == null || toEmail.isBlank()) {
+            log.warn("Skipping wallet creation email for walletId {}: no email address provided", walletId);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -40,6 +44,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendFeeDeductionEmail(String toEmail, Long walletId, BigDecimal amount, LocalDate date) {
+        if (toEmail == null || toEmail.isBlank()) {
+            log.warn("Skipping fee deduction email for walletId {}: no email address provided", walletId);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
