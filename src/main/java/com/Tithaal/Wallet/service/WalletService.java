@@ -21,4 +21,10 @@ public interface WalletService {
 
     /** Create a new wallet for the given userId and tenantId (both from JWT). */
     String addWallet(UUID userId, UUID tenantId);
+
+    /**
+     * Facilitates an order-based transaction between two users.
+     * Automatically resolves their primary wallets and reuses existing transfer logic.
+     */
+    String orderTransaction(com.Tithaal.Wallet.dto.OrderTransactionRequestDto request);
 }

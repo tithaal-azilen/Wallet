@@ -48,4 +48,13 @@ public class WalletController {
         String result = walletService.transfer(debitRequestDto, userId, status);
         return ResponseEntity.ok(new ApiResponse<>(true, result, null));
     }
+
+    @Operation(summary = "Order Transaction", description = "Transfer funds between users using their primary wallets.")
+    @PostMapping("/order-transaction")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> orderTransaction(
+            @Valid @RequestBody com.Tithaal.Wallet.dto.OrderTransactionRequestDto orderTransactionRequestDto) {
+        String result = walletService.orderTransaction(orderTransactionRequestDto);
+        return ResponseEntity.ok(new ApiResponse<>(true, result, null));
+    }
 }

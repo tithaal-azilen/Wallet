@@ -2,6 +2,9 @@ package com.Tithaal.Wallet.service.impl;
 
 import com.Tithaal.Wallet.dto.CreditRequestDto;
 import com.Tithaal.Wallet.dto.DebitRequestDto;
+import com.Tithaal.Wallet.dto.OrderTransactionRequestDto;
+import com.Tithaal.Wallet.dto.UserResponseDTO;
+import com.Tithaal.Wallet.client.AuthServiceClient;
 import com.Tithaal.Wallet.entity.Wallet;
 import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.entity.TransactionType;
@@ -33,6 +36,7 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuthServiceClient authServiceClient;
 
     @Override
     @Transactional
@@ -160,24 +164,30 @@ public class WalletServiceImpl implements WalletService {
         recipientWallet.credit(debitRequestDto.getAmount());
         walletRepository.save(recipientWallet);
 
+        String description = debitRequestDto.getDescription() != null ? debitRequestDto.getDescription() 
+                : "Transfer to wallet id: " + receivingId;
+
         walletTransactionRepository.save(WalletTransaction.builder()
                 .wallet(senderWallet)
                 .recipientWallet(recipientWallet)
                 .type(TransactionType.DEBIT)
                 .amount(debitRequestDto.getAmount())
-                .description("Transfer to wallet id: " + receivingId)
+                .description(description)
                 .balanceAfter(senderWallet.getBalance())
                 .userId(senderWallet.getUserId())
                 .tenantId(senderWallet.getTenantId())
                 .createdAt(Instant.now())
                 .build());
 
+        String recipientDescription = debitRequestDto.getDescription() != null ? debitRequestDto.getDescription() 
+                : "Transfer from wallet id: " + sendingId;
+
         walletTransactionRepository.save(WalletTransaction.builder()
                 .wallet(recipientWallet)
                 .recipientWallet(senderWallet)
                 .type(TransactionType.CREDIT)
                 .amount(debitRequestDto.getAmount())
-                .description("Transfer from wallet id: " + sendingId)
+                .description(recipientDescription)
                 .balanceAfter(recipientWallet.getBalance())
                 .userId(recipientWallet.getUserId())
                 .tenantId(recipientWallet.getTenantId())
@@ -187,6 +197,34 @@ public class WalletServiceImpl implements WalletService {
         log.info("Successfully transferred {} from Wallet {} to Wallet {}", debitRequestDto.getAmount(), sendingId,
                 receivingId);
         return "Transfer Successful!";
+    }
+
+    @Override
+    @Transactional
+    public String orderTransaction(OrderTransactionRequestDto request) {
+        log.info("Processing orderTransaction from {} to {} for amount {}", 
+            request.getSenderId(), request.getRecipientId(), request.getAmount());
+
+        Wallet senderWallet = walletRepository.findFirstByUserId(request.getSenderId())
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, 
+                    "No wallet found for sender: " + request.getSenderId()));
+
+        Wallet recipientWallet = walletRepository.findFirstByUserId(request.getRecipientId())
+                .orElseThrow(() -> new DomainException(ErrorType.NOT_FOUND, 
+                    "No wallet found for recipient: " + request.getRecipientId()));
+
+        // Fetch sender status from Auth Service for enforcement
+        UserResponseDTO sender = authServiceClient.getUserById(request.getSenderId());
+        String status = (sender != null) ? sender.getStatus() : "SUSPENDED"; // Fail-safe to suspended if user not found
+
+        DebitRequestDto debitRequestDto = new DebitRequestDto();
+        debitRequestDto.setSendingWalletId(senderWallet.getId());
+        debitRequestDto.setReceivingWalletId(recipientWallet.getId());
+        debitRequestDto.setAmount(request.getAmount());
+        debitRequestDto.setDescription(request.getDescription());
+
+        // Reuse existing transfer logic
+        return this.transfer(debitRequestDto, request.getSenderId(), status);
     }
 
     @Override
