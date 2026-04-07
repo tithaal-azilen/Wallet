@@ -1,5 +1,6 @@
 package com.Tithaal.Wallet.listener;
 
+import com.Tithaal.Wallet.client.AuthServiceClient;
 import com.Tithaal.Wallet.event.FeeDeductedEvent;
 import com.Tithaal.Wallet.event.WalletCreatedEvent;
 import com.Tithaal.Wallet.service.EmailService;
@@ -15,18 +16,29 @@ import org.springframework.stereotype.Component;
 public class NotificationEventListener {
 
     private final EmailService emailService;
+    private final AuthServiceClient authServiceClient;
 
     @Async
     @EventListener
     public void handleWalletCreatedEvent(WalletCreatedEvent event) {
-        log.info("Handling WalletCreatedEvent for walletId: {}", event.getWalletId());
-        emailService.sendWalletCreationEmail(event.getEmail(), event.getWalletId());
+        log.info("Handling WalletCreatedEvent for userId: {} and walletId: {}", event.getUserId(), event.getWalletId());
+        String email = authServiceClient.getUserEmail(event.getUserId());
+        if (email != null) {
+            emailService.sendWalletCreationEmail(email, event.getWalletId());
+        } else {
+            log.warn("Skipping email for WalletCreatedEvent: email not found for userId {}", event.getUserId());
+        }
     }
 
     @Async
     @EventListener
     public void handleFeeDeductedEvent(FeeDeductedEvent event) {
-        log.info("Handling FeeDeductedEvent for walletId: {}", event.getWalletId());
-        emailService.sendFeeDeductionEmail(event.getEmail(), event.getWalletId(), event.getAmount(), event.getDate());
+        log.info("Handling FeeDeductedEvent for userId: {} and walletId: {}", event.getUserId(), event.getWalletId());
+        String email = authServiceClient.getUserEmail(event.getUserId());
+        if (email != null) {
+            emailService.sendFeeDeductionEmail(email, event.getWalletId(), event.getAmount(), event.getDate());
+        } else {
+            log.warn("Skipping email for FeeDeductedEvent: email not found for userId {}", event.getUserId());
+        }
     }
 }

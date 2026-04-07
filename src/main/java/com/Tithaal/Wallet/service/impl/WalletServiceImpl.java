@@ -7,7 +7,6 @@ import com.Tithaal.Wallet.entity.WalletTransaction;
 import com.Tithaal.Wallet.entity.TransactionType;
 import com.Tithaal.Wallet.exception.DomainException;
 import com.Tithaal.Wallet.exception.ErrorType;
-import com.Tithaal.Wallet.client.AuthServiceClient;
 import com.Tithaal.Wallet.event.WalletCreatedEvent;
 import com.Tithaal.Wallet.repository.WalletRepository;
 import com.Tithaal.Wallet.repository.WalletTransactionRepository;
@@ -34,7 +33,6 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final AuthServiceClient authServiceClient;
 
     @Override
     @Transactional
@@ -49,13 +47,8 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet saved = walletRepository.save(wallet);
 
-        // Fetch email from Auth Service for notification
-        String email = authServiceClient.getUserEmail(userId);
-        if (email != null) {
-            eventPublisher.publishEvent(new WalletCreatedEvent(this, email, saved.getId()));
-        } else {
-            log.warn("Could not publish WalletCreatedEvent for userId {}: email not found", userId);
-        }
+        // Publish event for notification — listener will fetch user details
+        eventPublisher.publishEvent(new WalletCreatedEvent(this, userId, saved.getId()));
 
         log.info("Created wallet {} for user {} tenant {}", saved.getId(), userId, tenantId);
         return "Wallet created successfully with id: " + saved.getId();

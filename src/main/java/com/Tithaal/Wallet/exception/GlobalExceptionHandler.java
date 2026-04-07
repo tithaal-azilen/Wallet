@@ -54,6 +54,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, status);
     }
 
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<ErrorDetails> handleAPIException(APIException exception,
+            WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
+                webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, exception.getStatus());
+    }
+
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorDetails> handleAuthenticationException(
             org.springframework.security.core.AuthenticationException exception,
